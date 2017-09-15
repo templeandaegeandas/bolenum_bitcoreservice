@@ -1,0 +1,187 @@
+{"properties": [
+  {
+    "name": "bitcoinCoreService.networkParameters.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.networkParameters.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.networkParameters.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.networkParameters.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.serverurl.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.serverurl.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.serverurl.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.serverurl.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.serverurl.stage",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.serverurl.stage'"
+  },
+  {
+    "name": "bitcoinCoreService.networkParameters.stage",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.networkParameters.stage'"
+  },
+  {
+    "name": "bitcoinCoreService.db.name.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.name.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.db.name.stage",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.name.stage'"
+  },
+  {
+    "name": "bitcoinCoreService.db.name.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.name.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.dev.user",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.dev.user'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.dev.pass",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.dev.pass'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.pro.user",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.pro.user'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.pro.pass",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.pro.pass'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.stag.user",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.stag.user'"
+  },
+  {
+    "name": "bitcoinCoreService.db.auth.stag.pass",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.auth.stag.pass'"
+  },
+  {
+    "name": "bitcoinCoreService.db.driver",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.driver'"
+  },
+  {
+    "name": "bitcoinCoreService.db.port.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.port.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.db.port.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.port.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.db.port.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.port.stag'"
+  },
+  {
+    "name": "bitcoinCoreService.db.ip.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.ip.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.db.ip.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.ip.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.db.ip.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.db.ip.stag'"
+  },
+  {
+    "name": "bitcoinCoreService.wallet.location.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.wallet.location.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.wallet.location.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.wallet.location.stag'"
+  },
+  {
+    "name": "bitcoinCoreService.wallet.location.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.wallet.location.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.QRcode.location",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.QRcode.location'"
+  },
+  {
+    "name": "bitcoinCoreService.bitcoind.ip.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitcoind.ip.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.bitcoind.ip.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitcoind.ip.stag'"
+  },
+  {
+    "name": "bitcoinCoreService.bitcoind.port.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitcoind.port.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.bitcoind.port.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitcoind.port.stag'"
+  },
+  {
+    "name": "bitcoinCoreService.bitcoind.port.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitcoind.port.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.bitpay.url",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.bitpay.url'"
+  },
+  {
+    "name": "spring.template.cache",
+    "type": "java.lang.String",
+    "description": "A description for 'spring.template.cache'"
+  },
+  {
+    "name": "bitcoinCoreService.enableSecurity.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.enableSecurity.dev'"
+  },
+  {
+    "name": "bitcoinCoreService.enableSecurity.pro",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.enableSecurity.pro'"
+  },
+  {
+    "name": "bitcoinCoreService.enableSecurity.stag",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.enableSecurity.stag'"
+  },
+  {
+    "name": "springfox.documentation.swagger.v2.path",
+    "type": "java.lang.String",
+    "description": "A description for 'springfox.documentation.swagger.v2.path'"
+  }
+]}
