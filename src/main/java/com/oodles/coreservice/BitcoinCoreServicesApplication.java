@@ -1,12 +1,9 @@
 package com.oodles.coreservice;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -17,9 +14,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  *
  */
 @SpringBootApplication
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan("com.oodles.coreservice")
+//@Configuration
+//@EnableAutoConfiguration
+//@ComponentScan("com.oodles.coreservice")
 @EnableSwagger2
 @EnableAsync
 public class BitcoinCoreServicesApplication extends SpringBootServletInitializer{

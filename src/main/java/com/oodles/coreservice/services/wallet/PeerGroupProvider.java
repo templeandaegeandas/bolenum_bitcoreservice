@@ -125,10 +125,10 @@ public class PeerGroupProvider {
 		boolean result=false;
 		try {
 			String hostName=envConfiguration.getDBIp();
-			System.out.println("hostName in addLocalHost "+hostName);
+			log.debug("hostName in addLocalHost "+hostName);
 			InetAddress inetAddress = InetAddress.getByName(hostName);
 			int port = envConfiguration.getBitcoindPort();
-			System.out.println("port in addLocalHost method "+port);
+			log.debug("port in addLocalHost method "+port);
 			Socket socket = new Socket(inetAddress, port);
 			if (socket.isConnected()) {
 				peerGroup.addAddress(new PeerAddress(inetAddress, port));

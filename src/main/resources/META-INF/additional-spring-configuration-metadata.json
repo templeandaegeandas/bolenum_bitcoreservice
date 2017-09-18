@@ -183,5 +183,15 @@
     "name": "springfox.documentation.swagger.v2.path",
     "type": "java.lang.String",
     "description": "A description for 'springfox.documentation.swagger.v2.path'"
+  },
+  {
+    "name": "bitcoinCoreService.serverurl.stage",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.serverurl.stage'"
+  },
+  {
+    "name": "bitcoinCoreService.serverurl.dev",
+    "type": "java.lang.String",
+    "description": "A description for 'bitcoinCoreService.serverurl.dev'"
   }
 ]}

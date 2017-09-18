@@ -1,6 +1,6 @@
 package com.oodles.coreservice.exception;
 
-import org.apache.commons.httpclient.HttpStatus;
+import org.springframework.http.HttpStatus;
 
 public interface CustomGenericException {
 	public HttpStatus getStatus();

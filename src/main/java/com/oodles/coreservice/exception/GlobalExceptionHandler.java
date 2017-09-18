@@ -7,16 +7,17 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.log4j.Logger;
 import org.bitcoinj.core.InsufficientMoneyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 //@ControllerAdvice
 public class GlobalExceptionHandler {
-	public static final Logger log=Logger.getLogger(GlobalExceptionHandler.class);
+	public static final Logger log=LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	@ResponseBody
 	public Map<String,Object> handleDataIntegrityViolationException(HttpServletResponse response,DataIntegrityViolationException ex){
@@ -24,7 +25,7 @@ public class GlobalExceptionHandler {
 		map.put("localizeMsg",ex.getLocalizedMessage());
 		map.put("errMsg",ex.getMessage());
 		map.put("timeStamp",new Date().getTime());
-		map.put("status",HttpStatus.SC_BAD_REQUEST);
+		map.put("status",HttpStatus.BAD_REQUEST);
 		map.put("isSuccess","false");
 		response.setStatus(500);
 		return map;
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
 		map.put("localizeMsg",ex.getLocalizedMessage());
 		map.put("errMsg",ex.getMessage());
 		map.put("timeStamp",new Date().getTime());
-		map.put("status",HttpStatus.SC_BAD_REQUEST);
+		map.put("status",HttpStatus.BAD_REQUEST);
 		map.put("isSuccess","false");
 		response.setStatus(405);
 		return map;
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler {
 		map.put("localizeMsg",ex.getLocalizedMessage());
 		map.put("errMsg",ex.getMessage());
 		map.put("timeStamp",new Date().getTime());
-		map.put("status",HttpStatus.SC_BAD_REQUEST);
+		map.put("status",HttpStatus.BAD_REQUEST);
 		map.put("isSuccess","false");
 		response.setStatus(500);
 		return map;

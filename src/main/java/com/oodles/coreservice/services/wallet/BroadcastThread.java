@@ -42,7 +42,7 @@ public class BroadcastThread extends Thread {
 	@Autowired
 	WalletStoreService walletStoreService;
 	@Autowired
-	private static NetworkParamService networkParamService;
+	private NetworkParamService networkParamService;
 	private static Vector<String> pendingThreads = new Vector<String>();
 	private final static Set<TransactionBroadcast> runningBroadcasts = Collections
 			.synchronizedSet(new HashSet<TransactionBroadcast>());
@@ -51,7 +51,7 @@ public class BroadcastThread extends Thread {
 	@Autowired
 	private NetworkParamService tempNetworkParamService;
 	public BroadcastThread() {
-		System.out.println("it is default constructor");
+		log.debug("it is default constructor");
 	}
 
 	public BroadcastThread(Transaction tx, Wallet wallet, ThreadGroup threadGroup) {
@@ -67,7 +67,7 @@ public class BroadcastThread extends Thread {
 	}
 	@PostConstruct
 	public void init() {
-		System.out.println("init() in BroadcastThread");
+		log.debug("init() in BroadcastThread");
 		networkParamService = tempNetworkParamService;
 		
 	}
@@ -100,7 +100,7 @@ public class BroadcastThread extends Thread {
 					log.debug("after.getConfidenceType:: " + tx.getHashAsString());
 				}
 			} catch (Exception e) {
-				System.out.println("run() try block: " + e.getMessage());
+				log.error("run() try block: " + e.getMessage());
 			}
 		}
 		pendingThreads.remove(tx.getHashAsString());
@@ -118,9 +118,9 @@ public class BroadcastThread extends Thread {
 					wallet.receivePending(transaction, null);
 					walletStoreService.saveWallet(wallet);
 				} catch (VerificationException e) {
-					System.out.println("addListner(): " + e.getMessage());
+					log.error("addListner(): " + e.getMessage());
 				} catch (Exception e) {
-					System.out.println("addListner() excepetion block: " + e.getMessage());
+					log.error("addListner() excepetion block: " + e.getMessage());
 				}
 			}
 

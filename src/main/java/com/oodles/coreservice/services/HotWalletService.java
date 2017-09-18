@@ -22,7 +22,6 @@ import org.bitcoinj.core.Wallet.BalanceType;
 import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicKeyChain;
 import org.bitcoinj.wallet.DeterministicSeed;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +83,7 @@ public class HotWalletService {
 		SecureRandom random = new SecureRandom();
 		DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
 		DeterministicSeed seed = determinstickeychain.getSeed();
-		System.out.println("seed " + seed.getSeedBytes());
+		log.debug("create wallet seed: " + seed.getSeedBytes());
 		Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
 
 		ECKey eckey = new ECKey(); // elliptic curve cryptography class that
@@ -111,7 +110,7 @@ public class HotWalletService {
 		addressInfo.saveAndFlush(addrInfo);
 		WalletInfo savedWalletInfo = walletDao.save(walletInfo);
 
-		Log.info("walletName  >>>" + walletName);
+		log.info("walletName  >>>" + walletName);
 		try {
 			wallet.saveToFile(new File(walletName));
 		} catch (IOException e) {
@@ -120,7 +119,7 @@ public class HotWalletService {
 
 		walletStoreService.walletListner(wallet, savedWalletInfo);
 		map.put("walletUuid", wallet.getEarliestKeyCreationTime());
-		System.out.println(wallet);
+		log.debug("wallet info: "+wallet);
 		return map;
 	}
 	/**
@@ -195,9 +194,9 @@ public class HotWalletService {
 		 * issue Please note user will only able to spend confirmed bitcoins
 		 * which you can get through AVAILABLE_SPENDABLE
 		 */
-		System.out.println("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
+		log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
 				+ wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
-		System.out.println("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
+		log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
 				+ wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 
 		String balance = wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE).toFriendlyString();
@@ -224,7 +223,7 @@ public class HotWalletService {
 		map.put("address", wallet.currentReceiveAddress().toString());
 		map.put("Name", "adminWallet");
 		map.put("balance", wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE).toFriendlyString());
-		System.out.println("Wallet Map " + walletStoreService.getWalletMap().keySet());
+		log.debug("Wallet Map " + walletStoreService.getWalletMap().keySet());
 		return map;
 	}
 	
@@ -235,7 +234,7 @@ public class HotWalletService {
 		SecureRandom random = new SecureRandom();
 		DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
 		DeterministicSeed seed = determinstickeychain.getSeed();
-		System.out.println("seed " + seed.getSeedBytes());
+		log.debug("Admin wallet seed: " + seed.getSeedBytes());
 		Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
 
 		ECKey eckey = new ECKey(); // elliptic curve cryptography class that
@@ -257,7 +256,7 @@ public class HotWalletService {
 		addrInfo.setIsPrimary(true);
 		addressInfo.saveAndFlush(addrInfo);
 		WalletInfo savedWalletInfo = walletDao.save(walletInfo);
-		Log.info("walletName  >>>" + walletName);
+		log.info("walletName  >>>" + walletName);
 		try {
 			wallet.saveToFile(new File(walletName));
 		} catch (IOException e) {
@@ -278,7 +277,7 @@ public class HotWalletService {
 	// public Integer
 	// This method is used for calculate Transaction Status
 	public List<Map<String, String>> getAllAddressBalance(String walletUuid) {
-		Wallet wallet = (Wallet) walletStoreService.getWalletMap().get(walletUuid);
+		//Wallet wallet = (Wallet) walletStoreService.getWalletMap().get(walletUuid);
 		Map<String, String> json;
 		List<Map<String, String>> list = new ArrayList<>();
 
@@ -312,7 +311,7 @@ public class HotWalletService {
 		Wallet wallet = (Wallet) walletStoreService.getWalletMap().get(walletUuid);
 		if (wallet != null) {
 			List<Transaction> incommingTransaction = TransactionPoolManager.getIncomingTransactions(walletUuid);
-			System.out.println("incommingTransaction " + incommingTransaction);
+			log.debug("incommingTransaction " + incommingTransaction);
 			incommingTransaction.addAll(wallet.getTransactions(false));
 			Iterator<Transaction> itr = incommingTransaction.iterator();
 			while (itr.hasNext()) {
