@@ -33,7 +33,7 @@ public class TransactionBroadcastService extends Thread {
 	private static TransactionBroadcastService thread;
 	private static WalletStoreService walletStoreService;
 	@Autowired
-	private static NetworkParamService networkParamService;
+	private NetworkParamService networkParamService;
 	private ThreadGroup threadGroup;
 	@Autowired
 	private NetworkParamService tempNetworkParamService;

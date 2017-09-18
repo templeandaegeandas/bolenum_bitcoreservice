@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.oodles.coreservice.conf.EnvConfiguration;
 import com.oodles.coreservice.listner.ChainListener;
 import com.oodles.coreservice.services.NetworkParamService;
-import com.oodles.coreservice.services.WalletStoreService;
 
 /**
  *  Provider for block chain 
@@ -30,7 +29,7 @@ public class BlockChainProvider {
 	
 	//private static BlockChain chain;
 	private static BlockChain chain;
-	public static Logger log = LoggerFactory.getLogger(WalletStoreService.class);
+	public static Logger log = LoggerFactory.getLogger(BlockChainProvider.class);
 	@Autowired
 	private NetworkParamService tempNetworkParamService;
 	@Autowired
@@ -38,7 +37,7 @@ public class BlockChainProvider {
 
 	@PostConstruct
 	public void init() {
-		System.out.println("init() method");
+		log.debug("init() method called");
 		networkParamService = tempNetworkParamService;
 		envConfiguration=tempEnvConfiguration;
 	}
