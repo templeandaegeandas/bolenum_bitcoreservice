@@ -6,46 +6,39 @@ package com.oodles.coreservice.conf;
  */
 import org.springframework.beans.factory.annotation.Value;
 
-public class DevelopmentEnv implements EnvConfiguration {
+public class StagingEnv implements EnvConfiguration {
 	
-	@Value("${bitcoinCoreService.db.name.dev}")
+	@Value("${bitcoinCoreService.db.name.stage}")
 	private String dbName;
-//	@Value("${bitcoinCoreService.db.driver}")
-//	private String dbDriverName;
-	@Value("${bitcoinCoreService.db.port.dev}")
+	@Value("${bitcoinCoreService.db.port.stage}")
 	private String dbPort;
-	@Value("${bitcoinCoreService.db.ip.dev}")
+	@Value("${bitcoinCoreService.db.ip.stage}")
 	private String dbIpName;
-	@Value("${bitcoinCoreService.db.auth.dev.user}")
+	@Value("${bitcoinCoreService.db.auth.stage.user}")
 	private String dbUserName;
-	@Value("${bitcoinCoreService.db.auth.dev.pass}")
+	@Value("${bitcoinCoreService.db.auth.stage.pass}")
 	private String dbPassword;
-	@Value("${bitcoinCoreService.networkParameters.dev}")
+	@Value("${bitcoinCoreService.networkParameters.stage}")
 	String params;
-	@Value("${bitcoinCoreService.blockstore.db.name.dev}")
+	@Value("${bitcoinCoreService.blockstore.db.name.stage}")
 	String blockstoreDbName;
-	@Value("${bitcoinCoreService.bitcoind.port.dev}")
+	@Value("${bitcoinCoreService.bitcoind.port.stage}")
 	String bitcoindPort;
-	@Value("${bitcoinCoreService.wallet.location.dev}")
+	@Value("${bitcoinCoreService.wallet.location.stage}")
 	String walletLocation;
 	@Value("${bitcoinCoreService.bitpay.url}")
 	String bitpayUrl;
 	
-	@Value("${bitcoinCoreService.enableSecurity.dev}")
+	@Value("${bitcoinCoreService.enableSecurity.stage}")
 	boolean enableSecurity;
 	
-	@Value("${bitcoinCoreService.bitcoind.ip.dev}")
+	@Value("${bitcoinCoreService.bitcoind.ip.stage}")
 	String bitcoindUrl;
 	
 	@Override
 	public String getDBName() {
 		return dbName;
 	}
-
-//	@Override
-//	public String getDBDriver() {
-//		return dbDriverName;
-//	}
 
 	@Override
 	public String getDBPort() {

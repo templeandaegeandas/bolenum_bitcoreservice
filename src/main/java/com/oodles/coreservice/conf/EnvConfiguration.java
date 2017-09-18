@@ -9,7 +9,7 @@ package com.oodles.coreservice.conf;
 public interface EnvConfiguration {
 	String getDBName();
 
-	String getDBDriver();
+	//String getDBDriver();
 
 	String getDBPort();
 

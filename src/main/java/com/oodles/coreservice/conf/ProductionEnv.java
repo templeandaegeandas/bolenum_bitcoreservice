@@ -12,8 +12,8 @@ public class ProductionEnv implements EnvConfiguration {
 	
 	@Value("${bitcoinCoreService.db.name.pro}")
 	public String dbName;
-	@Value("${bitcoinCoreService.db.driver}")
-	public String dbDriverName;
+//	@Value("${bitcoinCoreService.db.driver}")
+//	public String dbDriverName;
 	@Value("${bitcoinCoreService.db.port.pro}")
 	public String dbPort;
 	@Value("${bitcoinCoreService.db.ip.pro}")
@@ -44,10 +44,10 @@ public class ProductionEnv implements EnvConfiguration {
 		return dbName;
 	}
 
-	@Override
-	public String getDBDriver() {
-		return dbDriverName;
-	}
+//	@Override
+//	public String getDBDriver() {
+//		return dbDriverName;
+//	}
 
 	@Override
 	public String getDBPort() {
