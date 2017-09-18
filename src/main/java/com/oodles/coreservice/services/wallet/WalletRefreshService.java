@@ -6,7 +6,7 @@ import javax.annotation.PostConstruct;
 
 import org.bitcoinj.core.AbstractBlockChain;
 import org.bitcoinj.core.PeerGroup;
-import org.bitcoinj.core.Wallet;
+import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,19 +88,18 @@ public class WalletRefreshService extends Thread {
 	/**
 	 * Download block chain 
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
-		System.out.println("run()");
-		peerGroup.startAsync();
-		peerGroup.awaitRunning();
+		log.debug("run() method");
+		peerGroup.start();
+		//peerGroup.awaitRunning();
 		while (!isInterrupted()) {
-			System.out.println("going to download");  
+			log.debug("going to download");  
 			try{
 				peerGroup.downloadBlockChain();
 				chain =  BlockChainProvider.get();
 				chain.drainOrphanBlocks();
-				System.out.println("Full Downloaded...!!");
+				log.debug("Full Downloaded...!!");
 				result=false;
 				if (syncForFirstTime) {
 					//PeerGroupProvider.upgrade(peerGroup);
@@ -123,7 +122,7 @@ public class WalletRefreshService extends Thread {
 			}
 		}
 		
-		peerGroup.stopAsync();
+		peerGroup.stop();
 		walletStoreService.saveAll();
 	}
 	/**

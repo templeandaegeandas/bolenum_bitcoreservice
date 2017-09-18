@@ -13,18 +13,20 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bitcoinj.core.BlockChain;
-import org.bitcoinj.core.DownloadProgressTracker;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.PeerAddress;
 import org.bitcoinj.core.PeerGroup;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.core.Wallet.BalanceType;
+import org.bitcoinj.core.listeners.DownloadProgressTracker;
 import org.bitcoinj.store.BlockStore;
 import org.bitcoinj.store.BlockStoreException;
 import org.bitcoinj.store.MemoryBlockStore;
-import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicKeyChain;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.bitcoinj.wallet.UnreadableWalletException;
+import org.bitcoinj.wallet.Wallet;
+import org.bitcoinj.wallet.Wallet.BalanceType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,7 +48,7 @@ import com.oodles.coreservice.services.wallet.WalletRefreshService;
 @Service
 public class ColdWalletService {
 	Map<String, Object> coldWalletMap = new HashMap<String, Object>();
-	
+	public static Logger log = LoggerFactory.getLogger(ColdWalletService.class);
 	@Autowired
 	TransactionBroadcastService transactionBroadcastService;
 	@Autowired
@@ -71,7 +73,7 @@ public class ColdWalletService {
 		SecureRandom random = new SecureRandom();
 		DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
 		DeterministicSeed seed = determinstickeychain.getSeed();
-		System.out.println("seed " + seed.getSeedBytes());
+		log.debug("create Cold Wallet seed " + seed.getSeedBytes());
 		Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
 		ECKey eckey = new ECKey();
 		wallet.importKey(eckey);
@@ -179,7 +181,8 @@ public class ColdWalletService {
 			if (object != null && object instanceof Wallet) {
 				Wallet wallet  = (Wallet) object;
 				WalletRefreshService.removeWallet(wallet);
-				wallet.removeEventListener(new CoinReceiveListner(walletInfo, wallet));
+				wallet.removeCoinsReceivedEventListener(new CoinReceiveListner(walletInfo, wallet));
+				//wallet.removeEventListener(new CoinReceiveListner(walletInfo, wallet));
 				coldWalletMap.remove(walletUuid);
 			} else {
 				throw new WalletException("Wallet is not synchronized yet with blockchain");
@@ -223,9 +226,9 @@ public class ColdWalletService {
 		Object object = coldWalletMap.get(walletUuid);
 		if (object != null) {
 			if (object instanceof Wallet) {
-				System.out.println("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
+					log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
 						+ ((Wallet) object).getBalance(BalanceType.AVAILABLE_SPENDABLE));
-				System.out.println("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
+					log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
 						+ ((Wallet) object).getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				
 				return ((Wallet) object).getBalance(BalanceType.ESTIMATED_SPENDABLE).toFriendlyString();

@@ -46,7 +46,7 @@ public class TransactionInfo {
 	private ProtocolType protocolType;
 	private WalletTransactionType walletTransactionType;
 	private TransactionType transactionType;
-	private Transaction transaction;
+	//private Transaction transaction;
 	public TransactionInfo(){
 		
 	}
@@ -166,13 +166,13 @@ public class TransactionInfo {
 	public void setWalletTransactionType(WalletTransactionType walletTransactionType) {
 		this.walletTransactionType = walletTransactionType;
 	}
-	public Transaction getTransaction() {
+	/*public Transaction getTransaction() {
 		return transaction;
 	}
 
 	public void setTransaction(Transaction transaction) {
 		this.transaction = transaction;
-	}
+	}*/
 
 	public TransactionType getTransactionType() {
 		return transactionType;

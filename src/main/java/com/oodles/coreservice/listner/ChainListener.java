@@ -1,8 +1,8 @@
 package com.oodles.coreservice.listner;
 
-import org.bitcoinj.core.AbstractBlockChainListener;
 import org.bitcoinj.core.StoredBlock;
 import org.bitcoinj.core.VerificationException;
+import org.bitcoinj.core.listeners.NewBestBlockListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import com.oodles.coreservice.services.bitcoinj.ConfirmedCoinSelector;
  *	
  * @author Murari Kumar
  */
-public class ChainListener extends AbstractBlockChainListener {
+public class ChainListener implements NewBestBlockListener {
 	public static Logger log = LoggerFactory.getLogger(ChainListener.class);
 	
 	@Override

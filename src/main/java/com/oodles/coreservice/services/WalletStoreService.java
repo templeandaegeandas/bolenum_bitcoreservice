@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.store.UnreadableWalletException;
+import org.bitcoinj.wallet.UnreadableWalletException;
+import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,8 @@ public class WalletStoreService {
 	 * @param walletInfo
 	 */
 	public void walletListner(Wallet wallet, WalletInfo walletInfo) {
-		wallet.addEventListener(new CoinReceiveListner(walletInfo, wallet));
+		wallet.addCoinsReceivedEventListener(new CoinReceiveListner());
+		//wallet.addEventListener(new CoinReceiveListner(walletInfo, wallet));
 		// wallet.allowSpendingUnconfirmedTransactions();
 	}
 	/**

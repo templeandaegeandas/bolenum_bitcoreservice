@@ -20,9 +20,9 @@ import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.core.Wallet.BalanceType;
-import org.bitcoinj.core.Wallet.SendRequest;
+import org.bitcoinj.wallet.SendRequest;
+import org.bitcoinj.wallet.Wallet;
+import org.bitcoinj.wallet.Wallet.BalanceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class TransactionService {
 
 		Address receiverAddress;
 		Context.propagate(new Context(netparams.getNetworkParameters()));
-		receiverAddress = new Address(netparams.getNetworkParameters(), transactionparams.getReceiverAddress());
+		receiverAddress =  Address.fromBase58(netparams.getNetworkParameters(), transactionparams.getReceiverAddress());
 		String amount = String.valueOf(transactionparams.getTransactionTradeAmount());
 		String fee = String.valueOf(transactionparams.getTransactionFee());
 		System.out.println("Address " + transactionparams.getReceiverAddress());
@@ -97,27 +97,28 @@ public class TransactionService {
 			if (wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)
 					.equals(wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE))) {
 				Coin btcCoin = Coin.parseCoin(amount);
-				Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
+				//Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
 
 				SendRequest request = SendRequest.to(receiverAddress, btcCoin);
+				request.feePerKb = Coin.ZERO;
 				request.ensureMinRequiredFee = false;
-				request.fee = Coin.valueOf(10000);
+				//request.fee = Coin.valueOf(10000);
 				if (transactionparams.getTransactionFee() != null) {
-					request.fee = Coin.parseCoin(fee);
+					request.feePerKb = Coin.parseCoin(fee);
 				}
 				// request.feePerKb = Coin.ZERO;
 				request.changeAddress = wallet.freshReceiveAddress();
 
 				Transaction transaction = wallet.sendCoinsOffline(request);
 				TransactionPoolManager.addTransaction(transaction);
-				System.out.println("wallet.getBalance()------->" + wallet.getBalance());
-				System.out.println(
+				log.debug("wallet.getBalance()------->" + wallet.getBalance());
+				log.debug(
 						"wallet.getBalance(BalanceType.AVAILABLE)------->" + wallet.getBalance(BalanceType.AVAILABLE));
-				System.out.println("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
+				log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
 						+ wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
-				System.out.println(
+				log.debug(
 						"wallet.getBalance(BalanceType.ESTIMATED------->" + wallet.getBalance(BalanceType.ESTIMATED));
-				System.out.println("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
+				log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
 						+ wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				walletStoreService.saveWallet(wallet);
 				transactionHash = request.tx.getHashAsString();
@@ -176,7 +177,7 @@ public class TransactionService {
 	 */
 	public String transactionForColdWallet(TransactionParams transactionParams) throws WalletException, AddressFormatException, InsufficientMoneyException, InterruptedException, ExecutionException, BitcoinTransactionException {
 
-		Address receiverAddress = new Address(netparams.getNetworkParameters(), transactionParams.getReceiverAddress());
+		Address receiverAddress =  Address.fromBase58(netparams.getNetworkParameters(), transactionParams.getReceiverAddress());
 			Object object = coldWalletService.getColdWalletMap().get(transactionParams.getWalletId());
 			if (object != null) {
 				if (object instanceof Wallet) {
@@ -186,13 +187,13 @@ public class TransactionService {
 						String amount = String.valueOf(transactionParams.getTransactionTradeAmount());
 						String fee = String.valueOf(transactionParams.getTransactionFee());
 						Coin btcCoin = Coin.parseCoin(amount);
-						Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
+						//SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
 
 						SendRequest request = SendRequest.to(receiverAddress, btcCoin);
 						request.ensureMinRequiredFee = false;
-						request.fee = Coin.valueOf(10000);
+						request.feePerKb = Coin.valueOf(10000);
 						if (transactionParams.getTransactionFee() != null) {
-							request.fee = Coin.parseCoin(fee);
+							request.feePerKb = Coin.parseCoin(fee);
 						}
 						// request.feePerKb = Coin.ZERO;
 						request.changeAddress = coldWallet.freshReceiveAddress();

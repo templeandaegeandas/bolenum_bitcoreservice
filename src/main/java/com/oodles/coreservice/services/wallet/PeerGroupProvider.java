@@ -80,8 +80,9 @@ public class PeerGroupProvider {
 		if(type==PeerGroupType.WALLET_REFRESH){
 			peerGroup = new PeerGroup(params, BlockChainProvider.get());
 			peerGroup.setMaxConnections(1);
-			peerGroup.addEventListener(new PeerEventListner());
+			//peerGroup.addEventListener(new PeerEventListner());
 			//peerGroup.setDownloadTxDependencies(true);
+			peerGroup.addOnTransactionBroadcastListener(new PeerEventListner());
 			if(!addLocalHost(peerGroup)){
 				upgrade(peerGroup);
 			}

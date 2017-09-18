@@ -1,8 +1,8 @@
 package com.oodles.coreservice.services;
 
-import org.bitcoinj.core.DownloadProgressTracker;
 import org.bitcoinj.core.PeerGroup;
-import org.bitcoinj.core.Wallet;
+import org.bitcoinj.core.listeners.DownloadProgressTracker;
+import org.bitcoinj.wallet.Wallet;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 /**

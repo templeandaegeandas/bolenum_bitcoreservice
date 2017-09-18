@@ -62,7 +62,7 @@ public class QRCodeService {
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		createQRCode(address, file_path, charset, hintMap, 200, 200);
-		AddressInfo address_info=new AddressInfo();
+		//AddressInfo address_info=new AddressInfo();
 		//address_info.setQrCodeFilename(file_name);
 		//address_info.setAddress(address);
 		//address_info.setLebel("Label this address");
@@ -89,10 +89,8 @@ public class QRCodeService {
 	 * @throws WriterException
 	 * @throws IOException
 	 */
-	@SuppressWarnings("deprecation")
-	public static void createQRCode(String qrCodeData, String filePath, String charset, Map hintMap, int qrCodeheight,
+	public static void createQRCode(String qrCodeData, String filePath, String charset, Map<EncodeHintType,ErrorCorrectionLevel> hintMap, int qrCodeheight,
 			int qrCodewidth) throws WriterException, IOException {
-		@SuppressWarnings("unchecked")
 		BitMatrix matrix = new MultiFormatWriter().encode(new String(qrCodeData.getBytes(charset), charset),
 				BarcodeFormat.QR_CODE, qrCodewidth, qrCodeheight, hintMap);
 		MatrixToImageWriter.writeToFile(matrix, filePath.substring(filePath.lastIndexOf('.') + 1), new File(filePath));

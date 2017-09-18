@@ -17,11 +17,11 @@ import org.bitcoinj.core.Context;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.Wallet;
-import org.bitcoinj.core.Wallet.BalanceType;
-import org.bitcoinj.store.UnreadableWalletException;
 import org.bitcoinj.wallet.DeterministicKeyChain;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.bitcoinj.wallet.UnreadableWalletException;
+import org.bitcoinj.wallet.Wallet;
+import org.bitcoinj.wallet.Wallet.BalanceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -289,7 +289,7 @@ public class HotWalletService {
 			json = new HashMap<String, String>();
 			try {
 
-				address1 = new Address(networkParamService.getNetworkParameters(), address.get(i).getAddress());
+				address1 = Address.fromBase58(networkParamService.getNetworkParameters(), address.get(i).getAddress());
 			} catch (AddressFormatException e) {
 				e.printStackTrace();
 			}

@@ -6,11 +6,11 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.bitcoinj.core.AbstractWalletEventListener;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
-import org.bitcoinj.core.Wallet;
+import org.bitcoinj.wallet.Wallet;
+import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import com.oodles.coreservice.services.wallet.TransactionPoolManager;
  *
  */
 @Component
-public class CoinReceiveListner extends AbstractWalletEventListener {
+public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	@Autowired
 	WalletStoreService tempWalletStoreService;
 	@Autowired
@@ -139,5 +139,4 @@ public class CoinReceiveListner extends AbstractWalletEventListener {
 					}
 				});
 	}
-
 }

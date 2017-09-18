@@ -62,7 +62,7 @@ public class BlockChainProvider {
 				e.printStackTrace();
 				System.exit(1);
 			}
-			chain.addListener(new ChainListener());
+			chain.addNewBestBlockListener(new ChainListener());
 		}
 		return chain;
 	}
