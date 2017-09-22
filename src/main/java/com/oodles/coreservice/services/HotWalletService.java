@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Context;
@@ -41,9 +40,11 @@ import com.oodles.coreservice.services.bitcoinj.AddressBalance;
 import com.oodles.coreservice.services.bitcoinj.ConfirmedCoinSelector;
 import com.oodles.coreservice.services.wallet.TransactionPoolManager;
 import com.oodles.coreservice.services.wallet.WalletRefreshService;
+
 /**
- *	A service that has methods to perform operation related to hot wallet
- *	@author Murari Kumar
+ * A service that has methods to perform operation related to hot wallet
+ * 
+ * @author Murari Kumar
  */
 @Service
 public class HotWalletService {
@@ -65,65 +66,80 @@ public class HotWalletService {
 	@Autowired
 	AddressInfoDao addressInfoDao;
 
-
 	public static Logger log = LoggerFactory.getLogger(HotWalletService.class);
+
 	/**
 	 * Create a hot wallet
+	 * 
 	 * @return
 	 * @throws URISyntaxException
 	 * @throws WriterException
 	 * @throws IOException
 	 */
-	public Map<String, Object> createWallet()
-			throws URISyntaxException, WriterException, IOException {
-		WalletInfo walletInfo = new WalletInfo();
-		walletInfo.setWalletType(WalletType.HOT_WALLET);
-		AddressInfo addrInfo = new AddressInfo();
-		int bits = 128;
-		SecureRandom random = new SecureRandom();
-		DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
-		DeterministicSeed seed = determinstickeychain.getSeed();
-		log.debug("create wallet seed: " + seed.getSeedBytes());
-		Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
+	public Map<String, Object> createWallet(String walletUuid) throws URISyntaxException, WriterException, IOException {
+			WalletInfo walletInfo = new WalletInfo();
+			walletInfo.setWalletType(WalletType.HOT_WALLET);
+			AddressInfo addrInfo = new AddressInfo();
+			Map<String, Object> map = new HashMap<String, Object>();
 
-		ECKey eckey = new ECKey(); // elliptic curve cryptography class that
-									// create unique public and private key.
-		wallet.importKey(eckey);
-		wallet.setCoinSelector(ConfirmedCoinSelector.get());
-		String walletName = envConfiguration.getWalletLocation() + '/' + wallet.getEarliestKeyCreationTime() + ".dat";
-		walletStoreService.getWalletMap().put("" + wallet.getEarliestKeyCreationTime(), wallet);
-		WalletRefreshService.addWallet(wallet);
-		walletInfo.setDateCreated(new Date());
-		walletInfo.setWalletUuid("" + wallet.getEarliestKeyCreationTime());
-		walletInfo.setWalletStatus(WalletStatus.ACTIVE);
-		walletInfo.setTimpStamp(wallet.getEarliestKeyCreationTime());
-		String seedCode = seed.getMnemonicCode().toString().replace(",", "").replace("[", "").replace("]", "");
-		walletInfo.setWalletSeedToken(seedCode);
-		Map<String, Object> qrMap = qrcodeservice.qrCodeGeneration(wallet.currentReceiveAddress().toString());
-		Map<String, Object> map = new HashMap<String, Object>();
-		addrInfo.setAddress(wallet.currentReceiveAddress().toString());
-		addrInfo.setQrCodeFilename(qrMap.get("file_name").toString());
-		addrInfo.setLabel("Primary Address");
-		addrInfo.setWalletUuid("" + wallet.getEarliestKeyCreationTime());
-		addrInfo.setAmount("0.00 BTC");
-		addrInfo.setIsPrimary(true);
-		addressInfo.saveAndFlush(addrInfo);
-		WalletInfo savedWalletInfo = walletDao.save(walletInfo);
+			int bits = 128;
+			SecureRandom random = new SecureRandom();
+			DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
+			DeterministicSeed seed = determinstickeychain.getSeed();
+			log.debug("create wallet seed: {}",  seed.getSeedBytes());
+			Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
 
-		log.info("walletName  >>>" + walletName);
-		try {
-			wallet.saveToFile(new File(walletName));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			ECKey eckey = new ECKey(); // elliptic curve cryptography class that
+										// create unique public and private key.
+			wallet.importKey(eckey);
+			wallet.setCoinSelector(ConfirmedCoinSelector.get());
+			long walletEarliestKeyCreationTime = wallet.getEarliestKeyCreationTime();
+			String walletName = null;
+			if (walletUuid == null || walletUuid.isEmpty()) {
+				walletInfo.setWalletUuid(String.valueOf(walletEarliestKeyCreationTime));
+				walletName = envConfiguration.getWalletLocation() + '/' + walletEarliestKeyCreationTime + ".dat";
+				walletStoreService.getWalletMap().put(String.valueOf(walletEarliestKeyCreationTime), wallet);
+				addrInfo.setWalletUuid(String.valueOf(walletEarliestKeyCreationTime));
+				map.put("walletUuid", walletEarliestKeyCreationTime);
+			} else {
+				walletInfo.setWalletUuid(String.valueOf(walletUuid));
+				walletName = envConfiguration.getWalletLocation() + '/' + walletUuid + ".dat";
+				walletStoreService.getWalletMap().put(String.valueOf(walletUuid), wallet);
+				addrInfo.setWalletUuid(String.valueOf(walletUuid));
+				map.put("walletUuid", walletUuid);
+			}
+			WalletRefreshService.addWallet(wallet);
+			walletInfo.setDateCreated(new Date());
+			walletInfo.setWalletStatus(WalletStatus.ACTIVE);
+			walletInfo.setTimpStamp(wallet.getEarliestKeyCreationTime());
+			String seedCode = seed.getMnemonicCode().toString().replace(",", "").replace("[", "").replace("]", "");
+			walletInfo.setWalletSeedToken(seedCode);
+			Map<String, Object> qrMap = qrcodeservice.qrCodeGeneration(wallet.currentReceiveAddress().toString());
+			addrInfo.setAddress(wallet.currentReceiveAddress().toString());
+			addrInfo.setQrCodeFilename(qrMap.get("file_name").toString());
+			addrInfo.setLabel("Primary Address");
+			// addrInfo.setWalletUuid("" + wallet.getEarliestKeyCreationTime());
+			addrInfo.setAmount("0.00 BTC");
+			addrInfo.setIsPrimary(true);
+			addressInfo.saveAndFlush(addrInfo);
+			WalletInfo savedWalletInfo = walletDao.save(walletInfo);
 
-		walletStoreService.walletListner(wallet, savedWalletInfo);
-		map.put("walletUuid", wallet.getEarliestKeyCreationTime());
-		log.debug("wallet info: "+wallet);
-		return map;
+			log.debug("walletName: {}", walletName);
+			try {
+				wallet.saveToFile(new File(walletName));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			walletStoreService.walletListner(wallet, savedWalletInfo);
+
+			log.debug("wallet info: {}", wallet);
+			return map;
 	}
+
 	/**
 	 * Get primary wallet address of a wallet
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -132,8 +148,10 @@ public class HotWalletService {
 		return address.getAddress();
 
 	}
+
 	/**
 	 * Get current receive wallet address of a wallet
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -143,9 +161,10 @@ public class HotWalletService {
 		Address address = wallet.currentReceiveAddress();
 		return address;
 	}
-	
+
 	/**
 	 * Generate a new wallet address
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -172,8 +191,10 @@ public class HotWalletService {
 
 		return map;
 	}
+
 	/**
 	 * Get all wallet address
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -182,8 +203,10 @@ public class HotWalletService {
 		List<AddressInfo> address = addressInfo.getAllAddress(walletUuid);
 		return address;
 	}
+
 	/**
 	 * Get wallet balance
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -194,16 +217,16 @@ public class HotWalletService {
 		 * issue Please note user will only able to spend confirmed bitcoins
 		 * which you can get through AVAILABLE_SPENDABLE
 		 */
-		log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
-				+ wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
-		log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
-				+ wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
+		log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE): {}", wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
+		log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE): {}", wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 
 		String balance = wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE).toFriendlyString();
 		return balance;
 	}
+
 	/**
 	 * Create a admin wallet
+	 * 
 	 * @return
 	 */
 	public Map<String, Object> createAdminWallet() {
@@ -223,10 +246,10 @@ public class HotWalletService {
 		map.put("address", wallet.currentReceiveAddress().toString());
 		map.put("Name", "adminWallet");
 		map.put("balance", wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE).toFriendlyString());
-		log.debug("Wallet Map " + walletStoreService.getWalletMap().keySet());
+		log.debug("Wallet Map: {} ", walletStoreService.getWalletMap().keySet());
 		return map;
 	}
-	
+
 	public void AdminWallet() {
 		WalletInfo walletInfo = new WalletInfo();
 		AddressInfo addrInfo = new AddressInfo();
@@ -234,7 +257,7 @@ public class HotWalletService {
 		SecureRandom random = new SecureRandom();
 		DeterministicKeyChain determinstickeychain = new DeterministicKeyChain(random, bits);
 		DeterministicSeed seed = determinstickeychain.getSeed();
-		log.debug("Admin wallet seed: " + seed.getSeedBytes());
+		log.debug("Admin wallet seed: {}", seed.getSeedBytes());
 		Wallet wallet = Wallet.fromSeed(networkParamService.getNetworkParameters(), seed);
 
 		ECKey eckey = new ECKey(); // elliptic curve cryptography class that
@@ -256,7 +279,7 @@ public class HotWalletService {
 		addrInfo.setIsPrimary(true);
 		addressInfo.saveAndFlush(addrInfo);
 		WalletInfo savedWalletInfo = walletDao.save(walletInfo);
-		log.info("walletName  >>>" + walletName);
+		log.debug("walletName : {}", walletName);
 		try {
 			wallet.saveToFile(new File(walletName));
 		} catch (IOException e) {
@@ -264,8 +287,10 @@ public class HotWalletService {
 		}
 		walletStoreService.walletListner(wallet, savedWalletInfo);
 	}
+
 	/**
 	 * Update wallet label
+	 * 
 	 * @param address
 	 * @param lebel
 	 * @return
@@ -277,7 +302,8 @@ public class HotWalletService {
 	// public Integer
 	// This method is used for calculate Transaction Status
 	public List<Map<String, String>> getAllAddressBalance(String walletUuid) {
-		//Wallet wallet = (Wallet) walletStoreService.getWalletMap().get(walletUuid);
+		// Wallet wallet = (Wallet)
+		// walletStoreService.getWalletMap().get(walletUuid);
 		Map<String, String> json;
 		List<Map<String, String>> list = new ArrayList<>();
 
@@ -303,8 +329,11 @@ public class HotWalletService {
 
 		return list;
 	}
+
 	/**
-	 * Get incoming transaction detail and update transaction status based on confirmation
+	 * Get incoming transaction detail and update transaction status based on
+	 * confirmation
+	 * 
 	 * @param walletUuid
 	 */
 	public void getIncommingTransaction(String walletUuid) {
@@ -324,8 +353,10 @@ public class HotWalletService {
 			}
 		}
 	}
+
 	/**
-	 * Get transaction status 
+	 * Get transaction status
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -360,8 +391,10 @@ public class HotWalletService {
 		}
 		return null;
 	}
+
 	/**
 	 * Get transaction hash confirmation in bulk
+	 * 
 	 * @param walletUuid
 	 * @param hashList
 	 * @return
@@ -396,8 +429,10 @@ public class HotWalletService {
 		}
 		return listOfTxs;
 	}
+
 	/**
 	 * Restore wallet from seed code
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */

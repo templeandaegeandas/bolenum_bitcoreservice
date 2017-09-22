@@ -77,7 +77,9 @@ public class HotWalletController {
 	public ResponseEntity<Object> createWallet(HttpServletRequest request) {
 		try {
 			if (authenticationService.authenticateRequest(request)) {
-				Map<String, Object> map = hotWalletService.createWallet();
+				String uuid = request.getParameter("uuid");
+				log.debug("wallet uuid : {}", uuid);
+				Map<String, Object> map = hotWalletService.createWallet(uuid);
 				return ResponseHandler.generateResponse("Hot wallet has been created successfully", HttpStatus.OK, false, map);
 			} else {
 				return ResponseHandler.generateResponse("Authentication unsuccessful", HttpStatus.UNAUTHORIZED, true,null);

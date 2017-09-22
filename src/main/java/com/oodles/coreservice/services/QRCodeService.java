@@ -36,7 +36,7 @@ public class QRCodeService {
 	AtomicInteger windowSize = new AtomicInteger(3);
 	@Value("${bitcoinCoreService.QRcode.location}")
 	private String filePath;
-	String sameFilename=null;
+	String sameFilename = null;
 	/**
 	 * Generate QR code for wallet address
 	 * @param address
@@ -52,10 +52,10 @@ public class QRCodeService {
 		UUID key = UUID.randomUUID();
 		String uuid = key.toString();
 		String file_path = filePath+"/"+uuid+".png";
-		String file_name= uuid+".png";
-		AddressInfo addressInfo=addressInfoDao.findByAddress(address);
+		String file_name = uuid+".png";
+		AddressInfo addressInfo = addressInfoDao.findByAddress(address);
 		
-		if(addressInfo==null){
+		if(addressInfo == null) {
 		String charset = "UTF-8"; // or "ISO-8859-1"
 		Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
 		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
@@ -71,8 +71,9 @@ public class QRCodeService {
 		map.put("file_name", file_name);
 		map.put("address", address);
 		return map;
-		}else
-			 sameFilename=addressInfo.getQrCodeFilename();
+		} else {
+			 sameFilename = addressInfo.getQrCodeFilename();
+		}
 		Map<String, Object> Samemap = new HashMap<String, Object>();
 		Samemap.put("address", address);
 		Samemap.put("file_name", sameFilename);
