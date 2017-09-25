@@ -1,7 +1,7 @@
 package com.oodles.coreservice.conf;
 
 /**
- * Deals with Environment configuration bean creation based on <b>dev</b> profile
+ * Deals with Environment configuration bean creation based on <b>stag</b> profile
  * @author Murari Kumar
  */
 import org.springframework.context.annotation.Bean;
