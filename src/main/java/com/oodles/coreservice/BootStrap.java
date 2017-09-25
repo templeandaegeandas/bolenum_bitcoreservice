@@ -36,10 +36,11 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
 	WalletStoreService walletStoreService;
 
 	@Value("${bitcoinCoreService.QRcode.location}")
-	private String qrFilePath;
+	private String qrFilePath; //qr code file location 
 
-	@Value("${bitcoinCoreService.wallet.location.dev}")
-	private String walletFilePath;
+	@Value("${bitcoinCoreService.wallet.location.dev}") 
+	private String walletFilePath; // wallet file location
+	
 	public static Logger log = LoggerFactory.getLogger(BootStrap.class);
 
 	// On application start this method will be automatically called
@@ -69,6 +70,7 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
 	}
 
 	/**
+	 * this will create the wallet and qrcode file location at start time if location not exist
 	 * @description createInitDirectories 
 	 * @param 
 	 * @return void 
