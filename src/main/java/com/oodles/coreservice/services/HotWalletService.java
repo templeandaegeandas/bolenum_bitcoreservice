@@ -21,6 +21,7 @@ import org.bitcoinj.wallet.DeterministicSeed;
 import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 import org.bitcoinj.wallet.Wallet.BalanceType;
+import org.hibernate.persister.walking.spi.WalkingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import com.oodles.coreservice.domain.WalletInfo;
 import com.oodles.coreservice.enums.TransactionStatus;
 import com.oodles.coreservice.enums.WalletStatus;
 import com.oodles.coreservice.enums.WalletType;
+import com.oodles.coreservice.exception.WalletException;
 import com.oodles.coreservice.services.bitcoinj.AddressBalance;
 import com.oodles.coreservice.services.bitcoinj.ConfirmedCoinSelector;
 import com.oodles.coreservice.services.wallet.TransactionPoolManager;
@@ -77,7 +79,13 @@ public class HotWalletService {
 	 * @throws IOException
 	 */
 	public Map<String, Object> createWallet(String walletUuid) throws URISyntaxException, WriterException, IOException {
-			WalletInfo walletInfo = new WalletInfo();
+		   
+			WalletInfo existingWalletInfo = walletDao.findByWalletUuid(walletUuid);
+			log.debug("existing wallet info: {} ",existingWalletInfo);
+		    if(existingWalletInfo != null) {
+			    throw new WalletException("Wallet already exist by this UUID: "+walletUuid);
+		    }
+		    WalletInfo walletInfo = new WalletInfo();
 			walletInfo.setWalletType(WalletType.HOT_WALLET);
 			AddressInfo addrInfo = new AddressInfo();
 			Map<String, Object> map = new HashMap<String, Object>();
