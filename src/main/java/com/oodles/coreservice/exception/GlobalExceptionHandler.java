@@ -42,11 +42,18 @@ public class GlobalExceptionHandler {
 		return map;
 	}
 	
-	
+	/**
+	 * to handle data integration exception if primary and foreign key voilation
+	 * @description handleDataIntegrityViolationException
+	 * @param 
+	 * @return Map<String,Object>
+	 * @exception 
+	 *
+	 */
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public Map<String,Object> handleDataIntegrityViolationException(HttpServletResponse response,DataIntegrityViolationException ex){
 		Map<String,Object> map=new HashMap<String, Object>();
-		map.put("localizeMsg",ex.getLocalizedMessage());
+		map.put(ResponseHandlerConstant.LOCAL_MSG,ex.getLocalizedMessage());
 		map.put(ResponseHandlerConstant.MESSAGE,ex.getMessage());
 		map.put(ResponseHandlerConstant.TIME_STAMP,new Date().getTime());
 		map.put(ResponseHandlerConstant.STATUS,HttpStatus.BAD_REQUEST.value());
@@ -54,11 +61,18 @@ public class GlobalExceptionHandler {
 		response.setStatus(HttpStatus.BAD_REQUEST.value());
 		return map;
 	}
-	
+	/**
+	 *  to handle memory insufficient memory exception 
+	 * @description handleInsufficientMoneyException
+	 * @param 
+	 * @return Map<String,Object>
+	 * @exception 
+	 *
+	 */
 	@ExceptionHandler(InsufficientMoneyException.class)
 	public Map<String,Object>handleInsufficientMoneyException(HttpServletResponse resp, InsufficientMoneyException ex){
 		Map<String,Object>map=new HashMap<String,Object>();
-		map.put("LocalizeMsg", ex.getLocalizedMessage());
+		map.put(ResponseHandlerConstant.LOCAL_MSG, ex.getLocalizedMessage());
 		map.put(ResponseHandlerConstant.MESSAGE, ex.getMessage());
 		map.put(ResponseHandlerConstant.TIME_STAMP, new Date().getTime());
 		map.put(ResponseHandlerConstant.ERROR, true);
@@ -68,11 +82,18 @@ public class GlobalExceptionHandler {
 		return map;
 	}
 		
-	
+	/**
+	 * to handle file related exception
+	 * @description handleIOException
+	 * @param 
+	 * @return Map<String,Object>
+	 * @exception 
+	 *
+	 */
 	@ExceptionHandler(IOException.class)
 	public Map<String,Object> handleIOException(HttpServletResponse response,IOException ex){
 		Map<String,Object> map=new HashMap<String, Object>();
-		map.put("localizeMsg",ex.getLocalizedMessage());
+		map.put(ResponseHandlerConstant.LOCAL_MSG,ex.getLocalizedMessage());
 		map.put(ResponseHandlerConstant.MESSAGE,ex.getMessage());
 		map.put(ResponseHandlerConstant.TIME_STAMP,new Date().getTime());
 		map.put(ResponseHandlerConstant.STATUS,HttpStatus.BAD_REQUEST.value());
@@ -80,11 +101,18 @@ public class GlobalExceptionHandler {
 		response.setStatus(HttpStatus.BAD_REQUEST.value());
 		return map;
 	}
-	
+	/**
+	 * to handle over all exception in application 
+	 * @description handleAllException
+	 * @param 
+	 * @return Map<String,Object>
+	 * @exception 
+	 *
+	 */
 	@ExceptionHandler(Exception.class)
 	public Map<String,Object> handleAllException(HttpServletResponse response,Exception ex){
 		Map<String,Object> map=new HashMap<String, Object>();
-		map.put("localizeMsg",ex.getLocalizedMessage());
+		map.put(ResponseHandlerConstant.LOCAL_MSG,ex.getLocalizedMessage());
 		map.put(ResponseHandlerConstant.MESSAGE,ex.getMessage());
 		map.put(ResponseHandlerConstant.TIME_STAMP,new Date().getTime());
 		map.put(ResponseHandlerConstant.STATUS,HttpStatus.INTERNAL_SERVER_ERROR.value());

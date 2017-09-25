@@ -12,6 +12,6 @@ public class ResponseHandlerConstant {
 	public static final String ERROR="error";
 	public static final String DATA="data";
 	public static final String TIME_STAMP="timeStamp";
-	
+	public static final String LOCAL_MSG="localizeMsg";
 
 }
