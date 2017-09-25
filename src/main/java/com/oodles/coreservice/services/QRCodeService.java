@@ -34,9 +34,11 @@ public class QRCodeService {
     @Autowired
     AddressInfoDao addressInfoDao;
 	AtomicInteger windowSize = new AtomicInteger(3);
+	
 	@Value("${bitcoinCoreService.QRcode.location}")
 	private String filePath;
-	String sameFilename = null;
+	
+	String existingQrFileName = null;
 	/**
 	 * Generate QR code for wallet address
 	 * @param address
@@ -72,12 +74,12 @@ public class QRCodeService {
 		map.put("address", address);
 		return map;
 		} else {
-			 sameFilename = addressInfo.getQrCodeFilename();
+			 existingQrFileName = addressInfo.getQrCodeFilename();
 		}
-		Map<String, Object> Samemap = new HashMap<String, Object>();
-		Samemap.put("address", address);
-		Samemap.put("file_name", sameFilename);
-		return Samemap;
+		Map<String, Object> existingQrMap = new HashMap<String, Object>();
+		existingQrMap.put("address", address);
+		existingQrMap.put("file_name", existingQrFileName);
+		return existingQrMap;
 	}
 	/**
 	 * Core method to create a QR code

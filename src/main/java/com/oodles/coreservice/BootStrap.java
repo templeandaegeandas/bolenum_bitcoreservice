@@ -52,6 +52,7 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
 		// BitCoinPriceUpdateService.getCurrencyRate("USD");
 		walletStoreService.loadAll();
 		WalletRefreshService.startService();
+		//create initial directories  
 		createInitDirectories();
 	}
 
