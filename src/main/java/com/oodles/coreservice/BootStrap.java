@@ -71,7 +71,7 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
 	}
 
 	/**
-	 * this will create the wallet and qrcode file location at start time if location not exist
+	 * this will create the wallet and qrcode file location at application start time if location not exist
 	 * @description createInitDirectories 
 	 * @param 
 	 * @return void 

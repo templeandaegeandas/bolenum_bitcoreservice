@@ -35,6 +35,7 @@ import com.oodles.coreservice.services.wallet.WalletRefreshService;
 import com.oodles.coreservice.util.ObjectMapperUtil;
 import com.oodles.coreservice.util.ResponseHandler;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -47,6 +48,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @RequestMapping("/api/v1")
+@Api(value="Hot wallet Controller")
 public class HotWalletController {
 
 	public static Logger log = LoggerFactory.getLogger(HotWalletController.class);
