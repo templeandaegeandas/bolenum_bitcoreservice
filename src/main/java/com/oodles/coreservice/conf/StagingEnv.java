@@ -8,31 +8,31 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class StagingEnv implements EnvConfiguration {
 	
-	@Value("${bitcoinCoreService.db.name.stage}")
+	@Value("${bitcoinCoreService.db.name.stag}")
 	private String dbName;
-	@Value("${bitcoinCoreService.db.port.stage}")
+	@Value("${bitcoinCoreService.db.port.stag}")
 	private String dbPort;
-	@Value("${bitcoinCoreService.db.ip.stage}")
+	@Value("${bitcoinCoreService.db.ip.stag}")
 	private String dbIpName;
-	@Value("${bitcoinCoreService.db.auth.stage.user}")
+	@Value("${bitcoinCoreService.db.auth.stag.user}")
 	private String dbUserName;
-	@Value("${bitcoinCoreService.db.auth.stage.pass}")
+	@Value("${bitcoinCoreService.db.auth.stag.pass}")
 	private String dbPassword;
-	@Value("${bitcoinCoreService.networkParameters.stage}")
+	@Value("${bitcoinCoreService.networkParameters.stag}")
 	String params;
-	@Value("${bitcoinCoreService.blockstore.db.name.stage}")
+	@Value("${bitcoinCoreService.blockstore.db.name.stag}")
 	String blockstoreDbName;
-	@Value("${bitcoinCoreService.bitcoind.port.stage}")
+	@Value("${bitcoinCoreService.bitcoind.port.stag}")
 	String bitcoindPort;
-	@Value("${bitcoinCoreService.wallet.location.stage}")
+	@Value("${bitcoinCoreService.wallet.location.stag}")
 	String walletLocation;
 	@Value("${bitcoinCoreService.bitpay.url}")
 	String bitpayUrl;
 	
-	@Value("${bitcoinCoreService.enableSecurity.stage}")
+	@Value("${bitcoinCoreService.enableSecurity.stag}")
 	boolean enableSecurity;
 	
-	@Value("${bitcoinCoreService.bitcoind.ip.stage}")
+	@Value("${bitcoinCoreService.bitcoind.ip.stag}")
 	String bitcoindUrl;
 	
 	@Override
