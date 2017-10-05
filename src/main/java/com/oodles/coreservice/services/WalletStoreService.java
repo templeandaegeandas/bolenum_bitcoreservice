@@ -21,9 +21,11 @@ import com.oodles.coreservice.enums.WalletStatus;
 import com.oodles.coreservice.enums.WalletType;
 import com.oodles.coreservice.listner.CoinReceiveListner;
 import com.oodles.coreservice.services.bitcoinj.ConfirmedCoinSelector;
+
 /**
- * A Service that Manages all hot wallet and this service has methods 
- * to load wallet and save wallet
+ * A Service that Manages all hot wallet and this service has methods to load
+ * wallet and save wallet
+ * 
  * @author Murari Kumar
  */
 @Service
@@ -35,11 +37,13 @@ public class WalletStoreService {
 	EnvConfiguration envConfiguration;
 
 	Map<String, Wallet> walletMap = new HashMap<String, Wallet>();
+
 	/**
 	 * Load all wallet to map
 	 */
 	public void loadAll() {
-		List<WalletInfo> walletInfoList = walletDao.getAllWalletOtherThanSpecifiedWallet(WalletStatus.ACTIVE,WalletType.COLD_WALLET);
+		List<WalletInfo> walletInfoList = walletDao.getAllWalletOtherThanSpecifiedWallet(WalletStatus.ACTIVE,
+				WalletType.COLD_WALLET);
 		Iterator<WalletInfo> itr = walletInfoList.iterator();
 		while (itr.hasNext()) {
 			WalletInfo walletInfo = itr.next();
@@ -49,8 +53,10 @@ public class WalletStoreService {
 			}
 		}
 	}
+
 	/**
 	 * Load wallet individually
+	 * 
 	 * @param walletInfo
 	 * @return
 	 */
@@ -64,24 +70,28 @@ public class WalletStoreService {
 				walletListner(wallet, walletInfo);
 			}
 		} catch (UnreadableWalletException e) {
-			log.error("loadWallet() IOException caught msg:" + e.getMessage());
+			log.error("loadWallet() IOException caught msg: {}", e.getMessage());
 		} catch (Exception e) {
-			log.error("loadWallet() General Exception caught msg:" + e.getMessage());
+			log.error("loadWallet() General Exception caught msg: {}", e.getMessage());
 		}
 		return wallet; // return wallet current balance
 	}
+
 	/**
 	 * Add bitcoin listener for wallet
+	 * 
 	 * @param wallet
 	 * @param walletInfo
 	 */
 	public void walletListner(Wallet wallet, WalletInfo walletInfo) {
 		wallet.addCoinsReceivedEventListener(new CoinReceiveListner());
-		//wallet.addEventListener(new CoinReceiveListner(walletInfo, wallet));
+		// wallet.addEventListener(new CoinReceiveListner(walletInfo, wallet));
 		// wallet.allowSpendingUnconfirmedTransactions();
 	}
+
 	/**
 	 * Get wallet location
+	 * 
 	 * @param walletUuid
 	 * @return
 	 */
@@ -89,57 +99,65 @@ public class WalletStoreService {
 		String fileName = envConfiguration.getWalletLocation() + '/' + walletUuid + ".dat";
 		return fileName;
 	}
+
 	/**
 	 * Save wallet to disk
+	 * 
 	 * @param wallet
 	 * @return
 	 */
 	public boolean saveWallet(Wallet wallet) {
 		String walletUuid;
-		Wallet adminWallet=getWalletMap().get("adminWallet");
-		if(adminWallet!=null && Long.valueOf(wallet.getEarliestKeyCreationTime()).equals(adminWallet.getEarliestKeyCreationTime())){
-			walletUuid="adminWallet";
-		}else{
+		Wallet adminWallet = getWalletMap().get("adminWallet");
+		if (adminWallet != null
+				&& Long.valueOf(wallet.getEarliestKeyCreationTime()).equals(adminWallet.getEarliestKeyCreationTime())) {
+			walletUuid = "adminWallet";
+		} else {
 			walletUuid = String.valueOf(wallet.getEarliestKeyCreationTime());
 		}
 		String walletName = envConfiguration.getWalletLocation() + '/' + walletUuid + ".dat";
 		WalletInfo walletInfo = walletDao.findByWalletUuid(walletUuid);
-		if(walletInfo.getWalletType().equals(WalletType.COLD_WALLET)){
+		if (walletInfo.getWalletType().equals(WalletType.COLD_WALLET)) {
 			return true;
 		}
 		try {
 			wallet.saveToFile(new File(walletName));
 			return true; // indicates wallet save successfully
 		} catch (IOException e) {
-			log.error("saveWallet() exception caught msg:" + e.getMessage());
+			log.error("saveWallet() exception caught msg: {}", e.getMessage());
 			return false;
 		}
 	}
+
 	/**
 	 * Get hot wallets
+	 * 
 	 * @return
 	 */
 	public Map<String, Wallet> getWalletMap() {
 		return walletMap;
 	}
+
 	/**
 	 * Save all wallet
 	 */
 	public void saveAll() {
-		System.out.println("saveAll()");
+		log.debug("saveAll() method called");
 		try {
 			Iterator<Wallet> itr = walletMap.values().iterator();
 			while (itr.hasNext()) {
 				saveWallet(itr.next());
 			}
 		} catch (NullPointerException exception) {
-			System.out.println("saveAll() walletMap is null " + exception.getMessage());
+			log.error("saveAll() walletMap is null: {}",exception.getMessage());
 		} catch (Exception e) {
-			System.out.println("saveAll() general exception block:" + e.getMessage());
+			log.error("saveAll() general exception block: {}", e.getMessage());
 		}
 	}
+
 	/**
 	 * Get wallet object
+	 * 
 	 * @param walletInfo
 	 * @return
 	 */

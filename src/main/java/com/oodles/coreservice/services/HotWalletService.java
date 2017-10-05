@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Context;
@@ -21,7 +22,6 @@ import org.bitcoinj.wallet.DeterministicSeed;
 import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 import org.bitcoinj.wallet.Wallet.BalanceType;
-import org.hibernate.persister.walking.spi.WalkingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,8 +130,8 @@ public class HotWalletService {
 			addrInfo.setAmount("0.00 BTC");
 			addrInfo.setIsPrimary(true);
 			addressInfo.saveAndFlush(addrInfo);
+			walletInfo.setWalletEarliestKeyCreationTime(String.valueOf(walletEarliestKeyCreationTime));
 			WalletInfo savedWalletInfo = walletDao.save(walletInfo);
-
 			log.debug("walletName: {}", walletName);
 			try {
 				wallet.saveToFile(new File(walletName));

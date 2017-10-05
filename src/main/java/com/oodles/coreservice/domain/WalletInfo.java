@@ -35,6 +35,9 @@ public class WalletInfo{
 	
 	private String walletSeedToken;
 	private Long timpStamp;
+	private String walletEarliestKeyCreationTime;
+	
+	
 	@OneToMany
 	@JoinColumn(name="WALLET_ID")
 	private Set<TransactionInfo> transactions = new HashSet<TransactionInfo>();
@@ -87,8 +90,10 @@ public class WalletInfo{
 	public void setTimpStamp(Long timpStamp) {
 		this.timpStamp = timpStamp;
 	}
-	
-	
-	
-
+	public String getWalletEarliestKeyCreationTime() {
+		return walletEarliestKeyCreationTime;
+	}
+	public void setWalletEarliestKeyCreationTime(String walletEarliestKeyCreationTime) {
+		this.walletEarliestKeyCreationTime = walletEarliestKeyCreationTime;
+	}
 }
