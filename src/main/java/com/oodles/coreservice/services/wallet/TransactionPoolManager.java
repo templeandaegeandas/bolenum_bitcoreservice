@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.wallet.Wallet;
@@ -28,21 +29,23 @@ import com.oodles.coreservice.services.WalletStoreService;
 @Service
 public class TransactionPoolManager {
 
+	private Logger log = Logger.getLogger(TransactionPoolManager.class);
 	private static Vector<Entry> transactionPool;
 
 	private static WalletStoreService walletStoreService;
 	@Autowired
 	private WalletStoreService tempWalletStoreService;
-	
+
 	@Autowired
 	EnvConfiguration envConfig;
 	@Autowired
 	NetworkParamService tempNetParams;
 	@Autowired
 	AddressInfoDao addressInfoDao;
+
 	@PostConstruct
 	public void init() {
-		System.out.println("init() in WalletRefreshService");
+		log.debug("init() in TransactionPoolManager");
 		walletStoreService = tempWalletStoreService;
 	}
 
@@ -69,18 +72,21 @@ public class TransactionPoolManager {
 			return;
 		}
 		for (Map.Entry<String, Wallet> entry : walletStoreService.getWalletMap().entrySet()) {
-			if(entry.getValue().isPendingTransactionRelevant(tx)){
+			if (entry.getValue().isPendingTransactionRelevant(tx)) {
 				transactionPool.add(new Entry(entry.getKey(), tx));
-				/** You can get information about transaction done to bitcoin-core wallet
-				 * from outside application instantly 
-				 *  
+				/**
+				 * You can get information about transaction done to
+				 * bitcoin-core wallet from outside application instantly
+				 * 
 				 */
 				break;
 			}
 		}
 	}
+
 	/**
 	 * Get incoming transaction for a wallet
+	 * 
 	 * @param walletId
 	 * @return
 	 */

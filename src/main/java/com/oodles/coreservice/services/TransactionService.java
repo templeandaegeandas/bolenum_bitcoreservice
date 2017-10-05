@@ -89,7 +89,7 @@ public class TransactionService {
 		receiverAddress =  Address.fromBase58(netparams.getNetworkParameters(), transactionparams.getReceiverAddress());
 		String amount = String.valueOf(transactionparams.getTransactionTradeAmount());
 		String fee = String.valueOf(transactionparams.getTransactionFee());
-		System.out.println("Address " + transactionparams.getReceiverAddress());
+		log.debug("create trnasaction receive Address: {}", transactionparams.getReceiverAddress());
 		final File walletFile = new File(
 				configuration.getWalletLocation() + "/" + transactionparams.getWalletId() + ".dat");
 		wallet = (Wallet) walletStoreService.getWalletMap().get(transactionparams.getWalletId());
@@ -111,15 +111,13 @@ public class TransactionService {
 
 				Transaction transaction = wallet.sendCoinsOffline(request);
 				TransactionPoolManager.addTransaction(transaction);
-				log.debug("wallet.getBalance()------->" + wallet.getBalance());
+				log.debug("wallet.getBalance(): {}", wallet.getBalance());
 				log.debug(
-						"wallet.getBalance(BalanceType.AVAILABLE)------->" + wallet.getBalance(BalanceType.AVAILABLE));
-				log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE)------->"
-						+ wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
+						"wallet.getBalance(BalanceType.AVAILABLE): {}", wallet.getBalance(BalanceType.AVAILABLE));
+				log.debug("wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE): {}", wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE));
 				log.debug(
-						"wallet.getBalance(BalanceType.ESTIMATED------->" + wallet.getBalance(BalanceType.ESTIMATED));
-				log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)------->"
-						+ wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
+						"wallet.getBalance(BalanceType.ESTIMATED: {}", wallet.getBalance(BalanceType.ESTIMATED));
+				log.debug("wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE): {}", wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				walletStoreService.saveWallet(wallet);
 				transactionHash = request.tx.getHashAsString();
 				saveTransactionDetails(receiverAddress.toString(), wallet, transactionHash,

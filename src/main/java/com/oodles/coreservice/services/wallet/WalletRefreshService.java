@@ -79,9 +79,12 @@ public class WalletRefreshService extends Thread {
 				log.debug("getEarliestKeyCreationTime  of adminWallet: {} ", adminWallet.getEarliestKeyCreationTime());
 			} else {
 				// to do syncing fast
-				//peerGroup.setFastCatchupTimeSecs(Long.valueOf(walletInfo.getWalletUuid()));
-				peerGroup.setFastCatchupTimeSecs(Long.valueOf(walletInfo.getWalletEarliestKeyCreationTime()));
-				log.debug("getEarliestKeyCreationTime  of Other wallet: {} ", walletInfo.getWalletEarliestKeyCreationTime());
+				// peerGroup.setFastCatchupTimeSecs(Long.valueOf(walletInfo.getWalletUuid()));
+				if (walletInfo.getWalletEarliestKeyCreationTime() != null) {
+					peerGroup.setFastCatchupTimeSecs(Long.parseLong(walletInfo.getWalletEarliestKeyCreationTime()));
+				}
+				log.debug("getEarliestKeyCreationTime  of Other wallet: {} ",
+						walletInfo.getWalletEarliestKeyCreationTime());
 			}
 		}
 		ConfirmedCoinSelector.setChainHeight(chainHeight);

@@ -40,7 +40,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	private static WalletStoreService walletStoreService;
 	private static TransactionService transactionService;
 
-	public static Logger log = LoggerFactory.getLogger(CoinReceiveListner.class);
+	private static Logger log = LoggerFactory.getLogger(CoinReceiveListner.class);
 
 	private WalletInfo walletInfo;
 
@@ -59,7 +59,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	}
 
 	public CoinReceiveListner(WalletInfo walletInfo, Wallet wallet) {
-		log.info("onCoinsReceived 1" + walletStoreService);
+		log.info("onCoinsReceived 1: {}", walletStoreService);
 		this.walletInfo = walletInfo;
 		if (!isAddListnerForUnconfirmedTransactionsRunning) {
 			map.put(walletInfo, wallet);
@@ -68,14 +68,14 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 
 	public CoinReceiveListner(WalletInfo walletInfo) {
 		// TODO Auto-generated constructor stub
-		log.info("onCoinsReceived 2" + walletStoreService);
+		log.info("onCoinsReceived 2: {}", walletStoreService);
 		this.walletInfo = walletInfo;
 
 	}
 
 	@Override
 	public void onCoinsReceived(final Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
-		log.info("onCoinsReceived 3" + walletStoreService);
+		log.info("onCoinsReceived 3: {}", walletStoreService);
 		walletStoreService.saveWallet(wallet);
 		// remove transaction from unconfirmed memory pool
 		if (tx.getValueSentFromMe(wallet).value == 0) {
@@ -112,8 +112,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 				new FutureCallback<TransactionConfidence>() {
 					@Override
 					public void onSuccess(TransactionConfidence result) {
-						System.out.println("onSuccess method");
-						System.out.println(result);
+						log.debug("onSuccess method result: {}",result);
 						// walletDirectTransactionService.saveTransaction(user,wallet,result);
 						try {
 							String walletUuid;

@@ -28,7 +28,7 @@ public class BlockChainProvider {
 
 	// private static BlockChain chain;
 	private static BlockChain chain;
-	public static Logger log = LoggerFactory.getLogger(BlockChainProvider.class);
+	private static Logger log = LoggerFactory.getLogger(BlockChainProvider.class);
 	@Autowired
 	private NetworkParamService tempNetworkParamService;
 //	@Autowired
@@ -48,7 +48,7 @@ public class BlockChainProvider {
 	 */
 	public static BlockChain get() {
 		if (chain == null) {
-			System.out.println(networkParamService);
+			log.debug("block chain newtwork param service: {}", networkParamService);
 			NetworkParameters params = networkParamService.getNetworkParameters();
 			try {
 				// PostgresFullPrunedBlockStore blockStore = new

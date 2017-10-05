@@ -8,6 +8,8 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 /**
  *	A service that has method to generate signature
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class KeyService {
+	private Logger log = LoggerFactory.getLogger(KeyService.class);
 	/**
 	 * Generate a authorization signature
 	 * @param nonce
@@ -27,7 +30,7 @@ public class KeyService {
 
 		    byte[] hmacData ;
 		    String encodedKey=null;
-		    System.out.println(secretKey);
+		    log.debug("get auth signature: {}",secretKey);
 		    try {
 		        SecretKeySpec secretkey = new SecretKeySpec(secretKey.getBytes("UTF-8"), "HmacSHA256");
 		        Mac mac = Mac.getInstance("HmacSHA256");
