@@ -10,8 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.bitcoinj.core.Transaction;
-
 import com.oodles.coreservice.enums.CurrencyType;
 import com.oodles.coreservice.enums.ProtocolType;
 import com.oodles.coreservice.enums.TransactionStatus;
@@ -29,6 +27,7 @@ public class TransactionInfo {
 	@Column(columnDefinition= "TIMESTAMP WITH TIME ZONE")	
 	@Temporal(TemporalType.TIMESTAMP)	
 	private Date dateUpdated;
+	@Column(unique=true)
 	private String transactionHash;
 	private Double transactionFee;
 	private Integer settingFee;

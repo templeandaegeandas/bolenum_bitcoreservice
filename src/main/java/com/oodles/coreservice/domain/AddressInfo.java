@@ -13,10 +13,10 @@ public class AddressInfo {
 	private String address;
 	private String amount;
 	private String label;
-	String walletUuid;
+	private String walletUuid;
 	public String qrCodeFilename;
 	private String walletBalance;
-	Boolean isPrimary;
+	private Boolean isPrimary;
 	
 	
 	public Boolean getIsPrimary() {
