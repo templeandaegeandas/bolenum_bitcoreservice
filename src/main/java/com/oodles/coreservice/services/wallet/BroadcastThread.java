@@ -25,9 +25,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.oodles.coreservice.services.NetworkParamService;
 import com.oodles.coreservice.services.WalletStoreService;
 import com.oodles.coreservice.services.wallet.PeerGroupProvider.PeerGroupType;
+
 /**
  * 
- * A class that has methods used to broadcast transactions to blockchain 
+ * A class that has methods used to broadcast transactions to blockchain
  * 
  * @author Murari Kumar
  *
@@ -37,7 +38,8 @@ public class BroadcastThread extends Thread {
 	public static Logger log = LoggerFactory.getLogger(BroadcastThread.class);
 	private Transaction tx;
 	private Wallet wallet;
-
+	private String walletUuid;
+	
 	private static PeerGroup peerGroup;
 	@Autowired
 	WalletStoreService walletStoreService;
@@ -50,28 +52,31 @@ public class BroadcastThread extends Thread {
 	// private final TransactionBroadcast broadcast ;
 	@Autowired
 	private NetworkParamService tempNetworkParamService;
+
 	public BroadcastThread() {
 		log.debug("it is default constructor");
 	}
 
-	public BroadcastThread(Transaction tx, Wallet wallet, ThreadGroup threadGroup) {
+	public BroadcastThread(Transaction tx, Wallet wallet, ThreadGroup threadGroup, String uuid) {
 		super(threadGroup, "broadcastThread");
 		this.tx = tx;
 		this.wallet = wallet;
+		this.walletUuid = uuid;
 		// broadcast = new TransactionBroadcast(peerGroup, tx);
 	}
-	
+
 	public static void initailizePeerGroupAndRunningBroadcast() {
 		if (peerGroup == null)
 			peerGroup = PeerGroupProvider.get(PeerGroupType.WALLET_REFRESH);
 	}
+
 	@PostConstruct
 	public void init() {
 		log.debug("init() in BroadcastThread");
 		networkParamService = tempNetworkParamService;
-		
+
 	}
-	
+
 	/**
 	 * Run a thread and add pending transaction to vector
 	 */
@@ -95,18 +100,20 @@ public class BroadcastThread extends Thread {
 				brod = true;
 				if (transaction != null) {
 					TransactionConfidence confidence = transaction.getConfidence();
-					log.debug("after.getDepthInBlocks:: " + confidence.getDepthInBlocks());
-					log.debug("after.getConfidenceType:: " + confidence.getConfidenceType());
-					log.debug("after.getConfidenceType:: " + tx.getHashAsString());
+					log.debug("after.getDepthInBlocks:: {}", confidence.getDepthInBlocks());
+					log.debug("after.getConfidenceType:: {}", confidence.getConfidenceType());
+					log.debug("after.getConfidenceType:: {}", tx.getHashAsString());
 				}
 			} catch (Exception e) {
-				log.error("run() try block: " + e.getMessage());
+				log.error("run() try block: {}", e.getMessage());
 			}
 		}
 		pendingThreads.remove(tx.getHashAsString());
 	}
+
 	/**
 	 * Listener for transaction
+	 * 
 	 * @param broadcast
 	 */
 	public void addListner(final TransactionBroadcast broadcast) {
@@ -116,7 +123,7 @@ public class BroadcastThread extends Thread {
 				runningBroadcasts.remove(broadcast);
 				try {
 					wallet.receivePending(transaction, null);
-					walletStoreService.saveWallet(wallet);
+					walletStoreService.saveWallet(wallet, walletUuid);
 				} catch (VerificationException e) {
 					log.error("addListner(): " + e.getMessage());
 				} catch (Exception e) {

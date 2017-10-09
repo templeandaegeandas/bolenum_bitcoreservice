@@ -3,6 +3,7 @@ package com.oodles.coreservice.services.wallet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -20,7 +21,8 @@ import com.oodles.coreservice.services.NetworkParamService;
 import com.oodles.coreservice.services.WalletStoreService;
 
 /**
- * A service that uses <b>BroadcastThread</b> class methods to broadcast transactions to blockchain 
+ * A service that uses <b>BroadcastThread</b> class methods to broadcast
+ * transactions to blockchain
  * 
  * @author Murari Kumar
  *
@@ -49,41 +51,46 @@ public class TransactionBroadcastService extends Thread {
 		networkParamService = tempNetworkParamService;
 		walletStoreService = tempWalletStoreService;
 	}
+
 	/**
 	 * broadcast pending transaction to blockchain
 	 */
 	@Override
 	public void run() {
-		int count = 0;
 		while (!isInterrupted()) {
-			log.debug("count: " + count);
 			try {
-				Iterator<Wallet> iterator = walletStoreService.getWalletMap().values().iterator();
-				while (iterator.hasNext()) {
-					Wallet wallet = iterator.next();
-					// Log.info("wallet details "+wallet);
-					Iterator<Transaction> itr = wallet.getTransactions(true).iterator();
+				Set<Map.Entry<String, Wallet>> wallets = walletStoreService.getWalletMap().entrySet();
+				for (Map.Entry<String, Wallet> wallet : wallets) {
+					Iterator<Transaction> itr = wallet.getValue().getTransactions(true).iterator();
 					while (itr.hasNext()) {
+						if (networkParamService != null) {
+							Context context = new Context(networkParamService.getNetworkParameters());
+							if (context != null) {
+								Context.propagate(context);
+							}
+						}
+
 						Transaction tx = itr.next();
 						if (tx != null) {
 							addTransaction(tx);
-						}
-						Context context = new Context(networkParamService.getNetworkParameters());
-						Context.propagate(context);
-						TransactionConfidence confidence = tx.getConfidence();
-						if (confidence.getDepthInBlocks() < 1
-								|| confidence.getConfidenceType().equals(ConfidenceType.PENDING)) {
-							BroadcastThread.initailizePeerGroupAndRunningBroadcast();
-							if (!BroadcastThread.isThreadActiveForTransactionHash(tx.getHashAsString())) {
-								log.debug("BroadcastThread is started for "+tx.getHashAsString()+" which has getDepthInBlocks "+confidence.getDepthInBlocks()+" and type status "+confidence.getConfidenceType());
-								BroadcastThread thread = new BroadcastThread(tx, wallet, threadGroup);
-								count++;
-								thread.start();
+							TransactionConfidence confidence = tx.getConfidence();
+							if (confidence.getDepthInBlocks() < 1
+									|| confidence.getConfidenceType().equals(ConfidenceType.PENDING)) {
+								BroadcastThread.initailizePeerGroupAndRunningBroadcast();
+								if (!BroadcastThread.isThreadActiveForTransactionHash(tx.getHashAsString())) {
+									log.debug(
+											"BroadcastThread is started for: {} which has getDepthInBlocks: {} and type status: {}",
+											tx.getHashAsString(), confidence.getDepthInBlocks(),
+											confidence.getConfidenceType());
+									BroadcastThread thread = new BroadcastThread(tx, wallet.getValue(), threadGroup,
+											wallet.getKey());
+									thread.start();
+									log.debug("pending tx thread started: {}", thread.getName());
+								}
 							}
 						}
 					}
 				}
-
 				try {
 					Thread.sleep(1000 * 60);
 				} catch (InterruptedException e) {
@@ -92,8 +99,35 @@ public class TransactionBroadcastService extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			/*
+			 * try { Iterator<Wallet> iterator =
+			 * walletStoreService.getWalletMap().values().iterator(); while
+			 * (iterator.hasNext()) { Wallet wallet = iterator.next(); //
+			 * Log.info("wallet details "+wallet); Iterator<Transaction> itr =
+			 * wallet.getTransactions(true).iterator(); while (itr.hasNext()) {
+			 * Transaction tx = itr.next(); if (tx != null) {
+			 * addTransaction(tx); } Context context = new
+			 * Context(networkParamService.getNetworkParameters());
+			 * Context.propagate(context); TransactionConfidence confidence =
+			 * tx.getConfidence(); if (confidence.getDepthInBlocks() < 1 ||
+			 * confidence.getConfidenceType().equals(ConfidenceType.PENDING)) {
+			 * BroadcastThread.initailizePeerGroupAndRunningBroadcast(); if
+			 * (!BroadcastThread.isThreadActiveForTransactionHash(tx.
+			 * getHashAsString())) { log.debug("BroadcastThread is started for "
+			 * + tx.getHashAsString() + " which has getDepthInBlocks " +
+			 * confidence.getDepthInBlocks() + " and type status " +
+			 * confidence.getConfidenceType()); BroadcastThread thread = new
+			 * BroadcastThread(tx, wallet, threadGroup); count++;
+			 * thread.start(); } } } }
+			 * 
+			 * try { Thread.sleep(1000 * 60); } catch (InterruptedException e) {
+			 * log.debug("sleep try block"); } } catch (Exception e) {
+			 * e.printStackTrace(); }
+			 */
 		}
 	}
+
 	/**
 	 * Start transaction broadcast service
 	 */
@@ -103,6 +137,7 @@ public class TransactionBroadcastService extends Thread {
 			thread.start();
 		}
 	}
+
 	/**
 	 * Stop transaction broadcast service
 	 */
@@ -112,15 +147,19 @@ public class TransactionBroadcastService extends Thread {
 			thread.interrupt();
 		}
 	}
+
 	/**
 	 * Add transaction to txMap
+	 * 
 	 * @param tx
 	 */
 	public void addTransaction(Transaction tx) {
 		txMap.put(tx.getHashAsString(), tx);
 	}
+
 	/**
 	 * Get txMap
+	 * 
 	 * @return
 	 */
 	public Map<String, Transaction> getTxMap() {

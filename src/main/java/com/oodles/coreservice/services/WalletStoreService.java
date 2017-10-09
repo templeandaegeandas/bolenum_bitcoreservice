@@ -30,7 +30,7 @@ import com.oodles.coreservice.services.bitcoinj.ConfirmedCoinSelector;
  */
 @Service
 public class WalletStoreService {
-	public static Logger log = LoggerFactory.getLogger(WalletStoreService.class);
+	private static Logger log = LoggerFactory.getLogger(WalletStoreService.class);
 	@Autowired
 	WalletDao walletDao;
 	@Autowired
@@ -84,9 +84,10 @@ public class WalletStoreService {
 	 * @param walletInfo
 	 */
 	public void walletListner(Wallet wallet, WalletInfo walletInfo) {
-		wallet.addCoinsReceivedEventListener(new CoinReceiveListner());
+		log.debug("wallet listner");
+		wallet.addCoinsReceivedEventListener(new CoinReceiveListner(walletInfo, wallet));
 		// wallet.addEventListener(new CoinReceiveListner(walletInfo, wallet));
-		// wallet.allowSpendingUnconfirmedTransactions();
+		wallet.allowSpendingUnconfirmedTransactions();
 	}
 
 	/**
@@ -106,16 +107,22 @@ public class WalletStoreService {
 	 * @param wallet
 	 * @return
 	 */
-	public boolean saveWallet(Wallet wallet) {
+	public boolean saveWallet(Wallet wallet, String uuid) {
+		log.debug("save wallet uuid: {}", uuid);
 		String walletUuid;
 		Wallet adminWallet = getWalletMap().get("adminWallet");
 		if (adminWallet != null
 				&& Long.valueOf(wallet.getEarliestKeyCreationTime()).equals(adminWallet.getEarliestKeyCreationTime())) {
 			walletUuid = "adminWallet";
 		} else {
-			walletUuid = String.valueOf(wallet.getEarliestKeyCreationTime());
+			if (uuid != null) {
+				walletUuid = uuid;
+			} else {
+				walletUuid = String.valueOf(wallet.getEarliestKeyCreationTime());
+			}
 		}
 		String walletName = envConfiguration.getWalletLocation() + '/' + walletUuid + ".dat";
+		log.debug("save wallet name: {}", walletName);
 		WalletInfo walletInfo = walletDao.findByWalletUuid(walletUuid);
 		if (walletInfo.getWalletType().equals(WalletType.COLD_WALLET)) {
 			return true;
@@ -144,12 +151,15 @@ public class WalletStoreService {
 	public void saveAll() {
 		log.debug("saveAll() method called");
 		try {
-			Iterator<Wallet> itr = walletMap.values().iterator();
-			while (itr.hasNext()) {
-				saveWallet(itr.next());
+			// Iterator<Wallet> itr = walletMap.values().iterator();
+			// while (itr.hasNext()) {
+			// saveWallet(itr.next());
+			// }
+			for (Map.Entry<String, Wallet> entry : walletMap.entrySet()) {
+				saveWallet(entry.getValue(), entry.getKey());
 			}
 		} catch (NullPointerException exception) {
-			log.error("saveAll() walletMap is null: {}",exception.getMessage());
+			log.error("saveAll() walletMap is null: {}", exception.getMessage());
 		} catch (Exception e) {
 			log.error("saveAll() general exception block: {}", e.getMessage());
 		}
