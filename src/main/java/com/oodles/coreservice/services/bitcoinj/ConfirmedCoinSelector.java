@@ -18,14 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+
 /**
- * A class that is manages wallet balance 
+ * A class that is manages wallet balance
  * 
  * @author Murari Kumar
  */
 public class ConfirmedCoinSelector implements CoinSelector {
-	public static Logger log = LoggerFactory
-			.getLogger(ConfirmedCoinSelector.class);
+	private static Logger log = LoggerFactory.getLogger(ConfirmedCoinSelector.class);
 	public static int minConfidenceLevel = 0;
 	// chainHeight is current block in block chain
 	private static int chainHeight = 0;
@@ -56,10 +56,10 @@ public class ConfirmedCoinSelector implements CoinSelector {
 			// chainHeight is the block number at this transaction exist in
 			// block chain
 			int chainHeight = tx.getConfidence().getAppearedAtChainHeight();
-			log.debug("Transaction Height "+chainHeight);
+			log.debug("Transaction Height: {}", chainHeight);
 			if (ConfirmedCoinSelector.chainHeight != 0 && chainHeight != 0
 					&& ConfirmedCoinSelector.chainHeight >= chainHeight) {
-				log.debug("Chain height in Confirmed Coin Selector -->"+ConfirmedCoinSelector.chainHeight);
+				log.debug("Chain height in Confirmed Coin Selector: {}", ConfirmedCoinSelector.chainHeight);
 				return (ConfirmedCoinSelector.chainHeight - chainHeight + 1);
 			} else {
 				// we can't calculate confirmations because peerGroup does not
@@ -81,8 +81,8 @@ public class ConfirmedCoinSelector implements CoinSelector {
 	public static void setChainHeight(int chainHeight) {
 		if (chainHeight > ConfirmedCoinSelector.chainHeight) {
 			ConfirmedCoinSelector.chainHeight = chainHeight;
-			if(ConfirmedCoinSelector.chainHeight >= 809032)
-			 log.debug("block height is updated by "+ConfirmedCoinSelector.chainHeight);
+			if (ConfirmedCoinSelector.chainHeight >= 120900)
+				log.debug("block height is updated by: {}", ConfirmedCoinSelector.chainHeight);
 		}
 	}
 
@@ -95,16 +95,14 @@ public class ConfirmedCoinSelector implements CoinSelector {
 	}
 
 	@Override
-	public CoinSelection select(Coin biTarget,
-			List<TransactionOutput> candidates) {
+	public CoinSelection select(Coin biTarget, List<TransactionOutput> candidates) {
 		// TODO Auto-generated method stub
 		long target = biTarget.value;
 		HashSet<TransactionOutput> selected = new HashSet<TransactionOutput>();
 		// Sort the inputs by age*value so we get the highest "coindays" spent.
 		// TODO: Consider changing the wallets internal format to track just
 		// outputs and keep them ordered.
-		ArrayList<TransactionOutput> sortedOutputs = new ArrayList<TransactionOutput>(
-				candidates);
+		ArrayList<TransactionOutput> sortedOutputs = new ArrayList<TransactionOutput>(candidates);
 		// When calculating the wallet balance, we may be asked to select all
 		// possible coins, if so, avoid sorting
 		// them in order to improve performance.
@@ -139,20 +137,16 @@ public class ConfirmedCoinSelector implements CoinSelector {
 			public int compare(TransactionOutput a, TransactionOutput b) {
 				int depth1 = 0;
 				int depth2 = 0;
-				TransactionConfidence conf1 = a.getParentTransaction()
-						.getConfidence();
-				TransactionConfidence conf2 = b.getParentTransaction()
-						.getConfidence();
+				TransactionConfidence conf1 = a.getParentTransaction().getConfidence();
+				TransactionConfidence conf2 = b.getParentTransaction().getConfidence();
 				if (conf1.getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
 					depth1 = conf1.getDepthInBlocks();
 				if (conf2.getConfidenceType() == TransactionConfidence.ConfidenceType.BUILDING)
 					depth2 = conf2.getDepthInBlocks();
 				Coin aValue = a.getValue();
 				Coin bValue = b.getValue();
-				BigInteger aCoinDepth = BigInteger.valueOf(aValue.value)
-						.multiply(BigInteger.valueOf(depth1));
-				BigInteger bCoinDepth = BigInteger.valueOf(bValue.value)
-						.multiply(BigInteger.valueOf(depth2));
+				BigInteger aCoinDepth = BigInteger.valueOf(aValue.value).multiply(BigInteger.valueOf(depth1));
+				BigInteger bCoinDepth = BigInteger.valueOf(bValue.value).multiply(BigInteger.valueOf(depth2));
 				int c1 = bCoinDepth.compareTo(aCoinDepth);
 				if (c1 != 0)
 					return c1;
@@ -163,10 +157,8 @@ public class ConfirmedCoinSelector implements CoinSelector {
 					return c2;
 				// They are entirely equivalent (possibly pending) so sort by
 				// hash to ensure a total ordering.
-				BigInteger aHash = a.getParentTransaction().getHash()
-						.toBigInteger();
-				BigInteger bHash = b.getParentTransaction().getHash()
-						.toBigInteger();
+				BigInteger aHash = a.getParentTransaction().getHash().toBigInteger();
+				BigInteger bHash = b.getParentTransaction().getHash().toBigInteger();
 				return aHash.compareTo(bHash);
 			}
 		});
@@ -186,17 +178,14 @@ public class ConfirmedCoinSelector implements CoinSelector {
 		// Only pick chain-included transactions, or transactions that are ours
 		// and pending.
 		TransactionConfidence confidence = tx.getConfidence();
-		TransactionConfidence.ConfidenceType type = confidence
-				.getConfidenceType();
+		TransactionConfidence.ConfidenceType type = confidence.getConfidenceType();
 
 		// first check weather transaction is created by us and status is
 		// pending in such case we will
 		// allow user to use this balance.
-		boolean result = (type
-				.equals(TransactionConfidence.ConfidenceType.BUILDING) || type
-				.equals(TransactionConfidence.ConfidenceType.PENDING))
-				&& confidence.getSource().equals(
-						TransactionConfidence.Source.SELF);
+		boolean result = (type.equals(TransactionConfidence.ConfidenceType.BUILDING)
+				|| type.equals(TransactionConfidence.ConfidenceType.PENDING))
+				&& confidence.getSource().equals(TransactionConfidence.Source.SELF);
 
 		if ((result || isConfirmed(tx))) {
 			return true;

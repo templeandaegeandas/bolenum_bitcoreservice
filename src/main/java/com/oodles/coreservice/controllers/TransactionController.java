@@ -98,7 +98,6 @@ public class TransactionController {
 			if (authenticationService.authenticateRequest(request)) {
 				hotWalletService.getIncommingTransaction(walletUuid);
 				List<TransactionInfo> details = transactionDao.getTransactionDetails(walletUuid);
-				System.out.println(details);
 				if (!details.isEmpty()) {
 					return ResponseHandler.generateResponse("Here is the transaction history", HttpStatus.OK, false,
 							details);

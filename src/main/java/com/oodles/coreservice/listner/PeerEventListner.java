@@ -1,6 +1,5 @@
 package com.oodles.coreservice.listner;
 
-import org.apache.log4j.Logger;
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.listeners.OnTransactionBroadcastListener;
@@ -11,11 +10,11 @@ import com.oodles.coreservice.services.wallet.TransactionPoolManager;
  * @author Murari Kumar
  */
 public class PeerEventListner implements OnTransactionBroadcastListener {
-	private static final Logger log=Logger.getLogger(PeerEventListner.class);
+	//private static final Logger log=Logger.getLogger(PeerEventListner.class);
 	@Override
     public void onTransaction(Peer peer, Transaction tx) {
-		log.info("onTransaction");
-		
+//		log.info("onTransaction");
+	
 		TransactionPoolManager.add(tx);
 	}
 }

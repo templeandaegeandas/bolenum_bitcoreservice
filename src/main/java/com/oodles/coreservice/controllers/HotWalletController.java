@@ -32,7 +32,6 @@ import com.oodles.coreservice.services.KeyService;
 import com.oodles.coreservice.services.QRCodeService;
 import com.oodles.coreservice.services.WalletStoreService;
 import com.oodles.coreservice.services.wallet.WalletRefreshService;
-import com.oodles.coreservice.util.ObjectMapperUtil;
 import com.oodles.coreservice.util.ResponseHandler;
 
 import io.swagger.annotations.Api;
@@ -200,7 +199,7 @@ public class HotWalletController {
 	public ResponseEntity<Object> getWalletBalance(@RequestParam String walletUuid,HttpServletRequest request) {
 		try {
 			if (authenticationService.authenticateRequest(request)) {
-				log.debug(ObjectMapperUtil.mapObjectToString(walletUuid));
+				log.debug("get balance of wallet uuid: {}",walletUuid);
 				boolean result = walletRefreshService.getStatus(WalletRefreshService.result);
 				if (result == true) {
 					return ResponseHandler.generateResponse("success", HttpStatus.OK, false, "Synchronizing");
