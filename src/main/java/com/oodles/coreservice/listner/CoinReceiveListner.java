@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.wallet.DefaultCoinSelector;
 import org.bitcoinj.wallet.Wallet;
 import org.bitcoinj.wallet.listeners.WalletCoinsReceivedEventListener;
 import org.slf4j.Logger;
@@ -76,12 +77,21 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	@Override
 	public void onCoinsReceived(final Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
 		log.info("onCoinsReceived 3: {}", walletStoreService);
-		walletStoreService.saveWallet(wallet);
-		// remove transaction from unconfirmed memory pool
-		if (tx.getValueSentFromMe(wallet).value == 0) {
-			TransactionPoolManager.remove(tx);
-			addFutureCallback(tx, wallet);
-		}
+		TransactionConfidence confidence = tx.getConfidence();
+		confidence.addEventListener(new TransactionConfidence.Listener() {
+			@Override
+			public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
+				boolean result = DefaultCoinSelector.isSelectable(tx);
+				if (result) {
+					walletStoreService.saveWallet(wallet, walletInfo.getWalletUuid());
+					// remove transaction from unconfirmed memory pool
+					if (tx.getValueSentFromMe(wallet).value == 0) {
+						TransactionPoolManager.remove(tx);
+						addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
+					}
+				}
+			}
+		});
 	}
 
 	public static void addListnerForUnconfirmedTransactions() {
@@ -100,35 +110,40 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 			while (iterator.hasNext()) {
 				tx = iterator.next();
 				if (tx.getValueSentFromMe(wallet).value == 0 && !ConfirmedCoinSelector.isConfirmed(tx)) {
-					new CoinReceiveListner(walletInfo).addFutureCallback(tx, wallet);
+					new CoinReceiveListner(walletInfo).addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
 				}
 			}
 		}
 	}
 
-	public void addFutureCallback(Transaction tx, final Wallet wallet) {
+	public void addFutureCallback(Transaction tx, final Wallet wallet, String uuid) {
 		log.debug("addFutureCallback()");
 		Futures.addCallback(tx.getConfidence().getDepthFuture(ConfirmedCoinSelector.getMinConfidenceLevel()),
 				new FutureCallback<TransactionConfidence>() {
 					@Override
 					public void onSuccess(TransactionConfidence result) {
-						log.debug("onSuccess method result: {}",result);
+						log.debug("onSuccess method result: {}", result);
 						// walletDirectTransactionService.saveTransaction(user,wallet,result);
+						String walletUuid = null;
 						try {
-							String walletUuid;
+
 							Wallet adminWallet = walletStoreService.getWalletMap().get("adminWallet");
 							if (adminWallet != null && Long.valueOf(wallet.getEarliestKeyCreationTime())
 									.equals(adminWallet.getEarliestKeyCreationTime())) {
 								walletUuid = "adminWallet";
 							} else {
-								walletUuid = String.valueOf(wallet.getEarliestKeyCreationTime());
+								if (uuid != null) {
+									walletUuid = uuid;
+								} else {
+									walletUuid = String.valueOf(wallet.getEarliestKeyCreationTime());
+								}
 							}
 							transactionService.saveTransactionReceiveInfo(wallet, tx, walletUuid);
 						} catch (Exception e) {
-							System.out.println("Issue in saving transaction");
+							log.error("Issue in saving transaction: {}",e.getMessage());
 							e.printStackTrace();
 						}
-						walletStoreService.saveWallet(wallet);
+						walletStoreService.saveWallet(wallet, walletUuid);
 						// advertisementService.autoEnable(user);
 					}
 
