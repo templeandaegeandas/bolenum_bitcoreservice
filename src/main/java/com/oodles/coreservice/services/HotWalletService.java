@@ -121,9 +121,10 @@ public class HotWalletService {
 		walletInfo.setTimpStamp(wallet.getEarliestKeyCreationTime());
 		String seedCode = seed.getMnemonicCode().toString().replace(",", "").replace("[", "").replace("]", "");
 		walletInfo.setWalletSeedToken(seedCode);
-		Map<String, Object> qrMap = qrcodeservice.qrCodeGeneration(wallet.currentReceiveAddress().toString());
+		// Map<String, Object> qrMap =
+		// qrcodeservice.qrCodeGeneration(wallet.currentReceiveAddress().toString());
 		addrInfo.setAddress(wallet.currentReceiveAddress().toString());
-		addrInfo.setQrCodeFilename(qrMap.get("file_name").toString());
+		// addrInfo.setQrCodeFilename(qrMap.get("file_name").toString());
 		addrInfo.setLabel("Primary Address");
 		// addrInfo.setWalletUuid("" + wallet.getEarliestKeyCreationTime());
 		addrInfo.setAmount("0.00 BTC");
@@ -134,12 +135,12 @@ public class HotWalletService {
 		log.debug("walletName: {}", walletName);
 		try {
 			wallet.saveToFile(new File(walletName));
+			log.debug("wallet saved successfully: {}", walletName);
 		} catch (IOException e) {
+			log.error("wallet :{} , saving error: {}", walletName, e.getMessage());
 			e.printStackTrace();
 		}
-
 		walletStoreService.walletListner(wallet, savedWalletInfo);
-
 		log.debug("wallet info: {}", wallet);
 		return map;
 	}
@@ -320,13 +321,15 @@ public class HotWalletService {
 		int size = address.size();
 
 		for (int i = 0; i < size; i++) {
-			//Address address1 = null;
+			// Address address1 = null;
 			json = new HashMap<String, String>();
-//			try {
-//				//address1 = Address.fromBase58(networkParamService.getNetworkParameters(), address.get(i).getAddress());
-//			} catch (AddressFormatException e) {
-//				e.printStackTrace();
-//			}
+			// try {
+			// //address1 =
+			// Address.fromBase58(networkParamService.getNetworkParameters(),
+			// address.get(i).getAddress());
+			// } catch (AddressFormatException e) {
+			// e.printStackTrace();
+			// }
 			// String balance = wallet.getBalance(new
 			// AddressBalance(address1)).toFriendlyString();
 			json.put("address", address.get(i).getAddress());
@@ -457,7 +460,7 @@ public class HotWalletService {
 			walletStoreService.getWalletMap().put("" + wallet.getEarliestKeyCreationTime(), wallet);
 			WalletRefreshService.addWallet(wallet);
 			walletStoreService.walletListner(wallet, walletInfo);
-			walletStoreService.saveWallet(wallet , walletUuid);
+			walletStoreService.saveWallet(wallet, walletUuid);
 		} catch (UnreadableWalletException e) {
 			e.printStackTrace();
 		}
