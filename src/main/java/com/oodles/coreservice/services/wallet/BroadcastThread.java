@@ -39,7 +39,7 @@ public class BroadcastThread extends Thread {
 	private Transaction tx;
 	private Wallet wallet;
 	private String walletUuid;
-	
+
 	private static PeerGroup peerGroup;
 	@Autowired
 	WalletStoreService walletStoreService;
@@ -105,7 +105,12 @@ public class BroadcastThread extends Thread {
 					log.debug("after.getConfidenceType:: {}", tx.getHashAsString());
 				}
 			} catch (Exception e) {
-				log.error("run() try block: {}", e.getMessage());
+				int count = 0;
+				if (count < 5) {
+					count++;
+					log.error("run() try block: {}", e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 		pendingThreads.remove(tx.getHashAsString());
