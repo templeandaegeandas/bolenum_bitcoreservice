@@ -81,12 +81,17 @@ public class BroadcastThread extends Thread {
 	 * Run a thread and add pending transaction to vector
 	 */
 	public void run() {
+		log.debug("hash string: {}", tx.getHashAsString());
+		int count = 0;
 		pendingThreads.add(tx.getHashAsString());
 		boolean brod = false;
 		while (!brod) {
 			try {
+				log.debug("network param: {}", networkParamService.getNetworkParameters());
 				Context context = new Context(networkParamService.getNetworkParameters());
+				log.debug("context: ", context);
 				Context.propagate(context);
+				log.debug("peer group: {}",peerGroup);
 				ListenableFuture<Transaction> txFutrue = peerGroup.broadcastTransaction(tx).broadcast();
 
 				// Transaction txAfterBroadcast = txFutrue.get();
@@ -95,8 +100,9 @@ public class BroadcastThread extends Thread {
 				// addListner(broadcast);
 				// runningBroadcasts.add(broadcast);
 				// broadcast.broadcast();
-
+				log.debug("tx future : {}", txFutrue);
 				Transaction transaction = txFutrue.get();
+				log.debug("transaction  : {}", transaction);
 				brod = true;
 				if (transaction != null) {
 					TransactionConfidence confidence = transaction.getConfidence();
@@ -105,7 +111,6 @@ public class BroadcastThread extends Thread {
 					log.debug("after.getConfidenceType:: {}", tx.getHashAsString());
 				}
 			} catch (Exception e) {
-				int count = 0;
 				if (count < 5) {
 					count++;
 					log.error("run() try block: {}", e.getMessage());

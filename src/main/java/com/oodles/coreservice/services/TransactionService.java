@@ -103,7 +103,7 @@ public class TransactionService {
 				// Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
 
 				SendRequest request = SendRequest.to(receiverAddress, btcCoin);
-				request.feePerKb = Coin.ZERO;
+				//request.feePerKb = Coin.ZERO;
 				request.ensureMinRequiredFee = false;
 				// request.fee = Coin.valueOf(10000);
 				if (transactionparams.getTransactionFee() != null) {
