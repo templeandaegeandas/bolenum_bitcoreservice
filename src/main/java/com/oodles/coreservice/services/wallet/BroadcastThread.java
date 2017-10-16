@@ -87,7 +87,9 @@ public class BroadcastThread extends Thread {
 		boolean brod = false;
 		while (!brod) {
 			try {
-				log.debug("network param: {}", networkParamService.getNetworkParameters());
+				log.debug("network param: {}");
+				log.debug("--->> {}", networkParamService);
+				log.debug("test network {}", networkParamService.getNetworkParameters());
 				Context context = new Context(networkParamService.getNetworkParameters());
 				log.debug("context: ", context);
 				if (context != null) {
