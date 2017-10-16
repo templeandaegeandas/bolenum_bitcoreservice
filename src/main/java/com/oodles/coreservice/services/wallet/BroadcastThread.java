@@ -90,8 +90,10 @@ public class BroadcastThread extends Thread {
 				log.debug("network param: {}", networkParamService.getNetworkParameters());
 				Context context = new Context(networkParamService.getNetworkParameters());
 				log.debug("context: ", context);
-				Context.propagate(context);
-				log.debug("peer group: {}",peerGroup);
+				if (context != null) {
+					Context.propagate(context);
+				}
+				log.debug("peer group: {}", peerGroup);
 				ListenableFuture<Transaction> txFutrue = peerGroup.broadcastTransaction(tx).broadcast();
 
 				// Transaction txAfterBroadcast = txFutrue.get();
