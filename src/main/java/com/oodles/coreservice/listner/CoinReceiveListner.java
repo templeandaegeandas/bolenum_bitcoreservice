@@ -46,7 +46,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	private WalletInfo walletInfo;
 
 	private static boolean isAddListnerForUnconfirmedTransactionsRunning;
-	private static Map<WalletInfo, Wallet> map = new HashMap<WalletInfo, Wallet>();
+	private static Map<WalletInfo, Wallet> walletAndWalletInfoMap = new HashMap<WalletInfo, Wallet>();
 
 	@PostConstruct
 	public void init() {
@@ -63,7 +63,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 		log.info("onCoinsReceived 1: {}", walletStoreService);
 		this.walletInfo = walletInfo;
 		if (!isAddListnerForUnconfirmedTransactionsRunning) {
-			map.put(walletInfo, wallet);
+			walletAndWalletInfoMap.put(walletInfo, wallet);
 		}
 	}
 
@@ -94,6 +94,16 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 		});
 	}
 
+	private static CoinReceiveListner getWalletListner(WalletInfo walletInfo) {
+		Map<String, CoinReceiveListner> map = walletStoreService.getWalletAndListener();
+		CoinReceiveListner coinReceiveListner = map.get(walletInfo.getWalletUuid());
+		log.debug("Exiting wallet listener: {}", coinReceiveListner);
+		if (coinReceiveListner != null) {
+			return coinReceiveListner;
+		}
+		return new CoinReceiveListner(walletInfo);
+	}
+
 	public static void addListnerForUnconfirmedTransactions() {
 		log.debug("addListnerForUnconfirmedTransactions()");
 		isAddListnerForUnconfirmedTransactionsRunning = true;
@@ -101,7 +111,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 		WalletInfo walletInfo;
 		Map.Entry<WalletInfo, Wallet> entry;
 		Transaction tx;
-		Iterator<Map.Entry<WalletInfo, Wallet>> entryIterator = map.entrySet().iterator();
+		Iterator<Map.Entry<WalletInfo, Wallet>> entryIterator = walletAndWalletInfoMap.entrySet().iterator();
 		while (entryIterator.hasNext()) {
 			entry = entryIterator.next();
 			wallet = entry.getValue();
@@ -110,7 +120,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 			while (iterator.hasNext()) {
 				tx = iterator.next();
 				if (tx.getValueSentFromMe(wallet).value == 0 && !ConfirmedCoinSelector.isConfirmed(tx)) {
-					new CoinReceiveListner(walletInfo).addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
+					getWalletListner(walletInfo).addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
 				}
 			}
 		}
@@ -140,7 +150,7 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 							}
 							transactionService.saveTransactionReceiveInfo(wallet, tx, walletUuid);
 						} catch (Exception e) {
-							log.error("Issue in saving transaction: {}",e.getMessage());
+							log.error("Issue in saving transaction: {}", e.getMessage());
 							e.printStackTrace();
 						}
 						walletStoreService.saveWallet(wallet, walletUuid);

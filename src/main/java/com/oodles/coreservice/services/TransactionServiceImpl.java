@@ -471,7 +471,7 @@ public class TransactionServiceImpl implements TransactionService {
 	@Async
 	@Override
 	public void saveTransactionReceiveInfo(Wallet wallet, Transaction tx, String walletUuid) {
-		log.info("Received Bitcoins for wallet:" + walletUuid + " with tx hash:" + tx.getHashAsString());
+		log.info("Received Bitcoins for wallet: {}, with tx hash: {}", walletUuid, tx.getHashAsString());
 		// TransactionInfo existingTxInfo = transactionDao.checkDuplicateTransaction(tx.getHashAsString(), TransactionType.RECEIVED);
 		TransactionInfo existingTxInfo = transactionDao.findByTransactionHash(tx.getHashAsString());
 		if (existingTxInfo == null) {
@@ -480,9 +480,7 @@ public class TransactionServiceImpl implements TransactionService {
 			txInfo.setTransactionConfirmation(ConfirmedCoinSelector.calculateConfirmations(tx));
 			txInfo.setTransactionHash(tx.getHashAsString());
 			txInfo.setWalletUuid(walletUuid);
-			// txInfo.setTransactionType(TransactionType.received);
 			txInfo.setTransactionType(TransactionType.RECEIVED);
-
 			String amount = tx.getValueSentToMe(wallet).toFriendlyString().replace("BTC", "");
 			Double transferAmount = Double.parseDouble(amount);
 			transferAmount = (double) Math.round(transferAmount * 100000000);
