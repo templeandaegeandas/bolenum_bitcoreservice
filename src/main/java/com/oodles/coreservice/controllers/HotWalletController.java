@@ -92,6 +92,7 @@ public class HotWalletController {
 		}
 	}
 
+    
     @ApiOperation(value = "Get current bitcoin address of a hot wallet",response = ResponseEntity.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Success in getting hot wallet address"),

@@ -36,11 +36,12 @@ import com.oodles.coreservice.util.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 /**
- * This class has methods for performing transaction and getting details related to a particular 
- * transaction for both hot and cold wallet 
+ * This class has methods for performing transaction and getting details related
+ * to a particular transaction for both hot and cold wallet
  *
- *	@author Murari Kumar and Ajit Soman
+ * @author Murari Kumar and Ajit Soman
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -65,16 +66,16 @@ public class TransactionController {
 			HttpServletRequest request) {
 		try {
 			if (authenticationService.authenticateRequest(request)) {
-				String response = null;
+				TransactionInfo transactionInfo = null;
 				try {
-					response = transactionservice.createTransaction(transactionparams);
+					transactionInfo = transactionservice.createTransaction(transactionparams);
 				} catch (Exception e) {
 					return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST, true, null);
 				}
 
-				if (response != null) {
+				if (transactionInfo != null) {
 					return ResponseHandler.generateResponse("Transaction has been successfully completed",
-							HttpStatus.OK, false, response);
+							HttpStatus.OK, false, transactionInfo);
 				} else {
 					return ResponseHandler.generateResponse("Transaction is not completed", HttpStatus.BAD_REQUEST,
 							true, null);
@@ -299,7 +300,6 @@ public class TransactionController {
 		}
 	}
 
-
 	@ApiOperation(value = "Get Cold wallet transaction hash confirmation using walletUuid", response = ResponseEntity.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success in getting transaction hash confirmation"),
 			@ApiResponse(code = 401, message = "You are not authorized. Please ensure that your are sending nonce,signature and apikey"),
@@ -317,7 +317,7 @@ public class TransactionController {
 			}
 		} catch (InvalidKeyException | NoSuchAlgorithmException e) {
 			return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.UNAUTHORIZED, true, null);
-		} catch(WalletException e){
+		} catch (WalletException e) {
 			return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST, true, null);
 		}
 	}

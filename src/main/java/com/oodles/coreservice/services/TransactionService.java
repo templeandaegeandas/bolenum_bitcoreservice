@@ -83,7 +83,7 @@ public class TransactionService {
 	 * @return
 	 * @throws Exception
 	 */
-	public String createTransaction(TransactionParams transactionparams) throws Exception {
+	public TransactionInfo createTransaction(TransactionParams transactionparams) throws Exception {
 		String transactionHash = null;
 		Wallet wallet = null;
 
@@ -123,13 +123,13 @@ public class TransactionService {
 						wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				walletStoreService.saveWallet(wallet, transactionparams.getWalletId());
 				transactionHash = request.tx.getHashAsString();
-				saveTransactionDetails(receiverAddress.toString(), wallet, transactionHash,
+				TransactionInfo transactionInfo=saveTransactionDetails(receiverAddress.toString(), wallet, transactionHash,
 						Double.valueOf((amount.toString())), transactionparams.getWalletId(),
 						transactionparams.getTransactionFee());
 				if (transactionHash == null) {
 					return null;
 				} else {
-					return transactionHash;
+					return transactionInfo;
 				}
 			} else {
 				throw new BitcoinTransactionException(
@@ -150,7 +150,7 @@ public class TransactionService {
 	 * @param walletUuid
 	 * @param transactionFee
 	 */
-	public void saveTransactionDetails(String address, Wallet wallet, String txHash, Double tradeAmount,
+	public TransactionInfo saveTransactionDetails(String address, Wallet wallet, String txHash, Double tradeAmount,
 			String walletUuid, Double transactionFee) {
 		TransactionInfo txInfo = new TransactionInfo();
 		txInfo.setCreatedDate(new Date());
@@ -165,7 +165,7 @@ public class TransactionService {
 			txInfo.setTransactionFee(transactionFee);
 		}
 		txInfo.setTransactionStatus(TransactionStatus.PENDING);
-		transactionDao.saveAndFlush(txInfo);
+		return transactionDao.saveAndFlush(txInfo);
 
 	}
 
