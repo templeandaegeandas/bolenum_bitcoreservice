@@ -39,12 +39,11 @@ public class BroadcastThread extends Thread {
 	private Transaction tx;
 	private Wallet wallet;
 	private String walletUuid;
-	
+
 	private static PeerGroup peerGroup;
 	@Autowired
 	WalletStoreService walletStoreService;
-	@Autowired
-	private NetworkParamService networkParamService;
+	private static NetworkParamService networkParamService;
 	private static Vector<String> pendingThreads = new Vector<String>();
 	private final static Set<TransactionBroadcast> runningBroadcasts = Collections
 			.synchronizedSet(new HashSet<TransactionBroadcast>());
@@ -74,7 +73,7 @@ public class BroadcastThread extends Thread {
 	public void init() {
 		log.debug("init() in BroadcastThread");
 		networkParamService = tempNetworkParamService;
-
+		log.debug("network param service: {}", networkParamService);
 	}
 
 	/**
@@ -85,7 +84,7 @@ public class BroadcastThread extends Thread {
 		boolean brod = false;
 		while (!brod) {
 			try {
-				
+
 				Context context = new Context(networkParamService.getNetworkParameters());
 				Context.propagate(context);
 				ListenableFuture<Transaction> txFutrue = peerGroup.broadcastTransaction(tx).broadcast();

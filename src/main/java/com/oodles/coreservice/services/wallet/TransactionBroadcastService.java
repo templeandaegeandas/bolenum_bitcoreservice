@@ -34,8 +34,7 @@ public class TransactionBroadcastService extends Thread {
 	WalletStoreService tempWalletStoreService;
 	private static TransactionBroadcastService thread;
 	private static WalletStoreService walletStoreService;
-	@Autowired
-	private NetworkParamService networkParamService;
+	private static NetworkParamService networkParamService;
 	private ThreadGroup threadGroup;
 	@Autowired
 	private NetworkParamService tempNetworkParamService;
@@ -61,7 +60,10 @@ public class TransactionBroadcastService extends Thread {
 			try {
 				Set<Map.Entry<String, Wallet>> wallets = walletStoreService.getWalletMap().entrySet();
 				for (Map.Entry<String, Wallet> wallet : wallets) {
-					Iterator<Transaction> itr = wallet.getValue().getTransactions(true).iterator();
+					/**
+					 * not including DEAD Transactions
+					 */
+					Iterator<Transaction> itr = wallet.getValue().getTransactions(false).iterator();
 					while (itr.hasNext()) {
 						if (networkParamService != null) {
 							Context context = new Context(networkParamService.getNetworkParameters());
@@ -103,7 +105,7 @@ public class TransactionBroadcastService extends Thread {
 			/*
 			 * try { Iterator<Wallet> iterator =
 			 * walletStoreService.getWalletMap().values().iterator(); while
-			 * (iterator.hasNext()) { Wallet wallet = iterator.next(); //
+			 * (iterator.hasNet()) { Wallet wallet = iterator.next(); //
 			 * Log.info("wallet details "+wallet); Iterator<Transaction> itr =
 			 * wallet.getTransactions(true).iterator(); while (itr.hasNext()) {
 			 * Transaction tx = itr.next(); if (tx != null) {
