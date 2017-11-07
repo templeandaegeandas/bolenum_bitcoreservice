@@ -76,18 +76,21 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 
 	@Override
 	public void onCoinsReceived(final Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
-		log.info("onCoinsReceived 3: {}", walletStoreService);
+		log.info("on Coins Received: {}", walletStoreService);
 		TransactionConfidence confidence = tx.getConfidence();
 		confidence.addEventListener(new TransactionConfidence.Listener() {
 			@Override
 			public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
 				boolean result = DefaultCoinSelector.isSelectable(tx);
+				log.info("result in coin receive listner: {}",result);
 				if (result) {
 					walletStoreService.saveWallet(wallet, walletInfo.getWalletUuid());
+					transactionService.saveTransactionReceiveInfo(wallet, tx, walletInfo.getWalletUuid());
 					// remove transaction from unconfirmed memory pool
 					if (tx.getValueSentFromMe(wallet).value == 0) {
 						TransactionPoolManager.remove(tx);
-						addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
+						// TODO check if it requires, removed due to memory use
+						// addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
 					}
 				}
 			}
