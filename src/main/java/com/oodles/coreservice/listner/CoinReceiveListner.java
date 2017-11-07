@@ -77,24 +77,40 @@ public class CoinReceiveListner implements WalletCoinsReceivedEventListener {
 	@Override
 	public void onCoinsReceived(final Wallet wallet, Transaction tx, Coin prevBalance, Coin newBalance) {
 		log.info("on Coins Received: {}", walletStoreService);
-		TransactionConfidence confidence = tx.getConfidence();
-		confidence.addEventListener(new TransactionConfidence.Listener() {
-			@Override
-			public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
-				boolean result = DefaultCoinSelector.isSelectable(tx);
-				log.info("result in coin receive listner: {}",result);
-				if (result) {
-					walletStoreService.saveWallet(wallet, walletInfo.getWalletUuid());
-					transactionService.saveTransactionReceiveInfo(wallet, tx, walletInfo.getWalletUuid());
-					// remove transaction from unconfirmed memory pool
-					if (tx.getValueSentFromMe(wallet).value == 0) {
-						TransactionPoolManager.remove(tx);
-						// TODO check if it requires, removed due to memory use
-						// addFutureCallback(tx, wallet, walletInfo.getWalletUuid());
+		int txConfirmation = ConfirmedCoinSelector.calculateConfirmations(tx);
+		log.info("number of confirmation: {} of tx: {}", txConfirmation, tx.getHash());
+		/**
+		 * checking tx has 6 confiramtions
+		 */
+		if (txConfirmation < 6) {
+			TransactionConfidence confidence = tx.getConfidence();
+			TransactionConfidence.Listener listener = new TransactionConfidence.Listener() {
+				@Override
+				public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
+					int txConfirmation = ConfirmedCoinSelector.calculateConfirmations(tx);
+					log.debug("number of confirmation: {}",txConfirmation);
+					if (txConfirmation >= 6) {
+						boolean isRemoved = confidence.removeEventListener(this);
+						log.debug("is event listener removed: {} of Tx: {}", isRemoved, tx.getHash());
+					}
+					boolean result = DefaultCoinSelector.isSelectable(tx);
+					log.info("result in coin receive listener: {}", result);
+					if (result) {
+						walletStoreService.saveWallet(wallet, walletInfo.getWalletUuid());
+						transactionService.saveTransactionReceiveInfo(wallet, tx, walletInfo.getWalletUuid());
+						// remove transaction from unconfirmed memory pool
+						if (tx.getValueSentFromMe(wallet).value == 0) {
+							TransactionPoolManager.remove(tx);
+							// TODO check if it requires, removed due to memory
+							// use
+							// addFutureCallback(tx, wallet,
+							// walletInfo.getWalletUuid());
+						}
 					}
 				}
-			}
-		});
+			};
+			confidence.addEventListener(listener);
+		}
 	}
 
 	private static CoinReceiveListner getWalletListner(WalletInfo walletInfo) {
