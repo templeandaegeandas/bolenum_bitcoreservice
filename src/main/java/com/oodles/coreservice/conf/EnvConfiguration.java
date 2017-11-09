@@ -32,5 +32,7 @@ public interface EnvConfiguration {
 	boolean isSecurityEnabled();
 	
 	String getBitcoindIp();
+	
+	String getBolenumURL();
 
 }
