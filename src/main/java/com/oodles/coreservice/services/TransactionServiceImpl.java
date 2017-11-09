@@ -32,6 +32,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.oodles.coreservice.conf.EnvConfiguration;
 import com.oodles.coreservice.dao.AddressInfoDao;
@@ -39,6 +40,7 @@ import com.oodles.coreservice.dao.TransactionDao;
 import com.oodles.coreservice.domain.AddressInfo;
 import com.oodles.coreservice.domain.TransactionInfo;
 import com.oodles.coreservice.domain.TransactionParams;
+import com.oodles.coreservice.dto.TransactionForm;
 import com.oodles.coreservice.enums.DateFilter;
 import com.oodles.coreservice.enums.TransactionStatus;
 import com.oodles.coreservice.enums.TransactionType;
@@ -90,7 +92,9 @@ public class TransactionServiceImpl implements TransactionService {
 
 		Address receiverAddress;
 		Context.propagate(new Context(netparams.getNetworkParameters()));
+		log.debug("Network Parameters: {}", netparams.getNetworkParameters());
 		receiverAddress = Address.fromBase58(netparams.getNetworkParameters(), transactionparams.getReceiverAddress());
+		log.debug("receiverAddress: {} ", receiverAddress);
 		String amount = String.valueOf(transactionparams.getTransactionTradeAmount());
 		String fee = String.valueOf(transactionparams.getTransactionFee());
 		log.debug("create trnasaction receive Address: {}", transactionparams.getReceiverAddress());
@@ -114,7 +118,7 @@ public class TransactionServiceImpl implements TransactionService {
 				// request.feePerKb = Coin.ZERO;
 
 				request.changeAddress = wallet.freshReceiveAddress();
-				log.debug("changed wallet address and started tx");
+				log.debug("changed wallet address and started tx for wallet: {}", transactionparams.getWalletId());
 
 				Transaction transaction = wallet.sendCoinsOffline(request);
 				log.debug("tx completed for wallet: {}", transactionparams.getWalletId());
@@ -474,10 +478,13 @@ public class TransactionServiceImpl implements TransactionService {
 	@Override
 	public void saveTransactionReceiveInfo(Wallet wallet, Transaction tx, String walletUuid) {
 		log.info("Received Bitcoins for wallet: {}, with tx hash: {}", walletUuid, tx.getHashAsString());
-		// TransactionInfo existingTxInfo = transactionDao.checkDuplicateTransaction(tx.getHashAsString(), TransactionType.RECEIVED);
+		// TransactionInfo existingTxInfo =
+		// transactionDao.checkDuplicateTransaction(tx.getHashAsString(),
+		// TransactionType.RECEIVED);
+		TransactionInfo txInfo = null;
 		TransactionInfo existingTxInfo = transactionDao.findByTransactionHash(tx.getHashAsString());
 		if (existingTxInfo == null) {
-			TransactionInfo txInfo = new TransactionInfo();
+			txInfo = new TransactionInfo();
 			txInfo.setCreatedDate(new Date());
 			txInfo.setTransactionConfirmation(ConfirmedCoinSelector.calculateConfirmations(tx));
 			txInfo.setTransactionHash(tx.getHashAsString());
@@ -489,7 +496,6 @@ public class TransactionServiceImpl implements TransactionService {
 			transferAmount = transferAmount / 100000000;
 			txInfo.setTransactionTradeAmount(transferAmount);
 			txInfo.setTransactionFee(0.000);
-
 			List<TransactionOutput> outputs = tx.getOutputs();
 			List<TransactionInput> inputs = tx.getInputs();
 
@@ -575,12 +581,14 @@ public class TransactionServiceImpl implements TransactionService {
 		 * If you want to send bitcoin receive information to your Application
 		 * use uncomment below code and provide endpoint of your app URL
 		 */
-		// final String uri = configuration.getBitcoinBankUrl();
-		// log.info("Sending data to " + uri);
-		// RestTemplate restTemplate = new RestTemplate();
-		// String result = restTemplate.postForObject(uri, txInfo,
-		// String.class);
-		// log.info("result:" + result);
+		TransactionForm transactionForm = new TransactionForm(txInfo.getTransactionHash(), txInfo.getSenderAddress(),
+				txInfo.getReceiverAddress(), txInfo.getTransactionFee(), txInfo.getTransactionTradeAmount(),
+				txInfo.getTransactionDescription());
+		final String uri = configuration.getBolenumURL();
+		log.info("Sending data to " + uri);
+		RestTemplate restTemplate = new RestTemplate();
+		String result = restTemplate.postForObject(uri, transactionForm, String.class);
+		log.info("result:" + result);
 
 	}
 }

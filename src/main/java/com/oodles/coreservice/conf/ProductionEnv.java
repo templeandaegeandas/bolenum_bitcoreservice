@@ -39,6 +39,9 @@ public class ProductionEnv implements EnvConfiguration {
 	@Value("${bitcoinCoreService.bitcoind.ip.pro}")
 	String bitcoindUrl;
 	
+	@Value("${bolenum.url.dev}")
+	String bolenumUrl;
+	
 	@Override
 	public String getDBName() {
 		return dbName;
@@ -101,5 +104,10 @@ public class ProductionEnv implements EnvConfiguration {
 	@Override
 	public String getBitcoindIp() {
 		return bitcoindUrl;
+	}
+
+	@Override
+	public String getBolenumURL() {
+		return bolenumUrl;
 	}
 }
