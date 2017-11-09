@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.InsufficientMoneyException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+
 /**
  * This class has methods for performing transaction and getting details related
  * to a particular transaction for both hot and cold wallet
@@ -56,6 +59,8 @@ public class TransactionController {
 	@Autowired
 	AuthenticationService authenticationService;
 
+	private Logger log = LoggerFactory.getLogger(TransactionController.class);
+
 	@ApiOperation(value = "Create a bitcoin transaction", response = ResponseEntity.class)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success in transaction"),
 			@ApiResponse(code = 401, message = "You are not authorized. Please ensure that your are sending nonce,signature and apikey"),
@@ -65,11 +70,17 @@ public class TransactionController {
 	public ResponseEntity<Object> WalletTransaction(@RequestBody TransactionParams transactionparams,
 			HttpServletRequest request) {
 		try {
+			log.debug("transactionparams walletid: {}, amount: {}, receive address: {}",
+					transactionparams.getWalletId(), transactionparams.getTransactionTradeAmount(),
+					transactionparams.getReceiverAddress());
 			if (authenticationService.authenticateRequest(request)) {
 				TransactionInfo transactionInfo = null;
 				try {
+					log.debug("transaction started for wallet id: {}",transactionparams.getWalletId());
 					transactionInfo = transactionservice.createTransaction(transactionparams);
 				} catch (Exception e) {
+					log.error("transaction exception: {}",e.getMessage());
+					e.printStackTrace();
 					return ResponseHandler.generateResponse(e.getMessage(), HttpStatus.BAD_REQUEST, true, null);
 				}
 

@@ -97,6 +97,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final File walletFile = new File(
 				configuration.getWalletLocation() + "/" + transactionparams.getWalletId() + ".dat");
 		wallet = (Wallet) walletStoreService.getWalletMap().get(transactionparams.getWalletId());
+		log.debug("tx from wallet name: {}", walletFile);
 		if (walletFile.exists()) {
 			if (wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)
 					.equals(wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE))) {
@@ -104,16 +105,19 @@ public class TransactionServiceImpl implements TransactionService {
 				// Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
 
 				SendRequest request = SendRequest.to(receiverAddress, btcCoin);
-				//request.feePerKb = Coin.ZERO;
+				// request.feePerKb = Coin.ZERO;
 				request.ensureMinRequiredFee = false;
 				// request.fee = Coin.valueOf(10000);
 				if (transactionparams.getTransactionFee() != null) {
 					request.feePerKb = Coin.parseCoin(fee);
 				}
 				// request.feePerKb = Coin.ZERO;
+
 				request.changeAddress = wallet.freshReceiveAddress();
+				log.debug("changed wallet address and started tx");
 
 				Transaction transaction = wallet.sendCoinsOffline(request);
+				log.debug("tx completed for wallet: {}", transactionparams.getWalletId());
 				TransactionPoolManager.addTransaction(transaction);
 				log.debug("wallet.getBalance(): {}", wallet.getBalance());
 				log.debug("wallet.getBalance(BalanceType.AVAILABLE): {}", wallet.getBalance(BalanceType.AVAILABLE));
@@ -124,19 +128,17 @@ public class TransactionServiceImpl implements TransactionService {
 						wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				walletStoreService.saveWallet(wallet, transactionparams.getWalletId());
 				transactionHash = request.tx.getHashAsString();
-				TransactionInfo transactionInfo = saveTransactionDetails(receiverAddress.toString(), wallet, transactionHash,
-						Double.valueOf((amount.toString())), transactionparams.getWalletId(),
+				TransactionInfo transactionInfo = saveTransactionDetails(receiverAddress.toString(), wallet,
+						transactionHash, Double.valueOf((amount.toString())), transactionparams.getWalletId(),
 						transactionparams.getTransactionFee());
-				if (transactionHash == null) {
-					return null;
-				} else {
-					return transactionInfo;
-				}
+				return transactionInfo;
 			} else {
+				log.error("previous transaction has not confirmed yet");
 				throw new BitcoinTransactionException(
 						"Your previous transaction has not confirmed yet,So you can't perform this transaction. Please try after some time");
 			}
 		} else {
+			log.error("wallet file not exist");
 			throw new FileNotFoundException("Wallet not found");
 		}
 	}
@@ -505,7 +507,7 @@ public class TransactionServiceImpl implements TransactionService {
 				log.error("received address error: {}", e.getMessage());
 				e.printStackTrace();
 			}
-			log.debug("receive address: {}",receivedAddress);
+			log.debug("receive address: {}", receivedAddress);
 			if (receivedAddress != null) {
 				AddressInfo addrInfo = addressInfoDao.findByAddress(receivedAddress);
 				if (addrInfo != null) {
