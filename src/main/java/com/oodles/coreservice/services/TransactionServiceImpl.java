@@ -128,8 +128,9 @@ public class TransactionServiceImpl implements TransactionService {
 						wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE));
 				walletStoreService.saveWallet(wallet, transactionparams.getWalletId());
 				transactionHash = request.tx.getHashAsString();
-				TransactionInfo transactionInfo = saveTransactionDetails(receiverAddress.toString(), wallet,
-						transactionHash, Double.valueOf((amount.toString())), transactionparams.getWalletId(),
+
+				TransactionInfo transactionInfo = saveTransactionDetails(receiverAddress.toString(), wallet, transactionHash,
+						Double.valueOf((amount.toString())), transactionparams.getWalletId(),
 						transactionparams.getTransactionFee());
 				if (transactionHash == null) {
 					return null;
