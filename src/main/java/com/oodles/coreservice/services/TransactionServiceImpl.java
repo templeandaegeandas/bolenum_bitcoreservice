@@ -2,6 +2,7 @@ package com.oodles.coreservice.services;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -89,6 +90,8 @@ public class TransactionServiceImpl implements TransactionService {
 	public TransactionInfo createTransaction(TransactionParams transactionparams) throws Exception {
 		String transactionHash = null;
 		Wallet wallet = null;
+		DecimalFormat df = new DecimalFormat("0");
+		df.setMaximumFractionDigits(8);
 
 		Address receiverAddress;
 		Context.propagate(new Context(netparams.getNetworkParameters()));
@@ -96,7 +99,7 @@ public class TransactionServiceImpl implements TransactionService {
 		receiverAddress = Address.fromBase58(netparams.getNetworkParameters(), transactionparams.getReceiverAddress());
 		log.debug("receiverAddress: {} ", receiverAddress);
 		String amount = String.valueOf(transactionparams.getTransactionTradeAmount());
-		String fee = String.valueOf(transactionparams.getTransactionFee());
+		String feePerKb = String.valueOf(transactionparams.getTransactionFee());
 		log.debug("create trnasaction receive Address: {}", transactionparams.getReceiverAddress());
 		final File walletFile = new File(
 				configuration.getWalletLocation() + "/" + transactionparams.getWalletId() + ".dat");
@@ -106,21 +109,18 @@ public class TransactionServiceImpl implements TransactionService {
 			if (wallet.getBalance(BalanceType.ESTIMATED_SPENDABLE)
 					.equals(wallet.getBalance(BalanceType.AVAILABLE_SPENDABLE))) {
 				Coin btcCoin = Coin.parseCoin(amount);
-				// Wallet.SendRequest.DEFAULT_FEE_PER_KB = Coin.ZERO;
-
 				SendRequest request = SendRequest.to(receiverAddress, btcCoin);
-				// request.feePerKb = Coin.ZERO;
 				request.ensureMinRequiredFee = false;
-				// request.fee = Coin.valueOf(10000);
 				if (transactionparams.getTransactionFee() != null) {
-					request.feePerKb = Coin.parseCoin(fee);
+					request.feePerKb = Coin.parseCoin(feePerKb);
 				}
-				// request.feePerKb = Coin.ZERO;
-
+				log.debug("fee per kb: {}/Kb", request.feePerKb.toFriendlyString());
 				request.changeAddress = wallet.freshReceiveAddress();
 				log.debug("changed wallet address and started tx for wallet: {}", transactionparams.getWalletId());
-
 				Transaction transaction = wallet.sendCoinsOffline(request);
+				Double fee = Double.valueOf((transaction.getFee() != null)
+						? transaction.getFee().toFriendlyString().replaceAll("BTC", "") : "0.001");
+				log.debug("transaction fee: {}", df.format(fee));
 				log.debug("tx completed for wallet: {}", transactionparams.getWalletId());
 				TransactionPoolManager.addTransaction(transaction);
 				log.debug("wallet.getBalance(): {}", wallet.getBalance());
@@ -133,8 +133,7 @@ public class TransactionServiceImpl implements TransactionService {
 				walletStoreService.saveWallet(wallet, transactionparams.getWalletId());
 				transactionHash = request.tx.getHashAsString();
 				TransactionInfo transactionInfo = saveTransactionDetails(receiverAddress.toString(), wallet,
-						transactionHash, Double.valueOf((amount.toString())), transactionparams.getWalletId(),
-						transactionparams.getTransactionFee());
+						transactionHash, Double.valueOf((amount.toString())), transactionparams.getWalletId(), fee);
 				return transactionInfo;
 			} else {
 				log.error("previous transaction has not confirmed yet");
@@ -168,7 +167,7 @@ public class TransactionServiceImpl implements TransactionService {
 		txInfo.setTransactionHash(txHash);
 		txInfo.setTransactionTradeAmount(tradeAmount);
 		txInfo.setWalletUuid(walletUuid);
-		txInfo.setTransactionFee(0.0001);
+		txInfo.setTransactionFee(0.001);
 		if (transactionFee != null) {
 			txInfo.setTransactionFee(transactionFee);
 		}
