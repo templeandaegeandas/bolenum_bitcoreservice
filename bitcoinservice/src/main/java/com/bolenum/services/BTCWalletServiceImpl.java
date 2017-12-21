@@ -60,27 +60,6 @@ public class BTCWalletServiceImpl implements BTCWalletService {
 		}
 	}
 
-	/*
-	 * @Override public void blockEventListener() {
-	 * logger.debug("block event listener started"); try { BtcdClient client =
-	 * ResourceUtils.getBtcdProvider(); BtcdDaemon daemon = new
-	 * BtcdDaemonImpl(client);
-	 * logger.info("Verifying that the daemon started successfully");
-	 * daemon.isMonitoring(Notifications.ALERT);
-	 * daemon.isMonitoring(Notifications.BLOCK);
-	 * daemon.isMonitoring(Notifications.WALLET); daemon.isMonitoringAny();
-	 * daemon.isMonitoringAll();
-	 * 
-	 * daemon.addBlockListener(new BlockListener() {
-	 * 
-	 * @Override public void blockDetected(Block block) { //
-	 * transactions(block.getTx(), client);
-	 * logger.info("New block detected! (Event details: '%s')\n", block); } });
-	 * logger.info("total block listener: {}", daemon.countBlockListeners()); }
-	 * catch (BitcoindException | CommunicationException e) {
-	 * logger.error("blockEventListener error: {}", e); } }
-	 */
-
 	private void transactions(List<String> txs, BtcdClient client) {
 		if (txs.isEmpty()) {
 			return;
@@ -132,7 +111,9 @@ public class BTCWalletServiceImpl implements BTCWalletService {
 				transaction.setTransactionStatus(TransactionStatus.DEPOSIT);
 				transaction.setCurrencyName("BTC");
 				transaction.setTransferStatus(TransferStatus.COMPLETED);
-				transaction.setToAddress(coin.getWalletAddress());
+				if (coin != null) {
+					transaction.setToAddress(coin.getWalletAddress());
+				}
 				transactionRepo.save(transaction);
 			}
 		} catch (NumberFormatException e) {
@@ -158,7 +139,9 @@ public class BTCWalletServiceImpl implements BTCWalletService {
 			transaction.setTransactionStatus(TransactionStatus.DEPOSIT);
 			transaction.setCurrencyName("BTC");
 			transaction.setTransferStatus(TransferStatus.COMPLETED);
-			transaction.setToAddress(coin.getWalletAddress());
+			if (coin != null) {
+				transaction.setToAddress(coin.getWalletAddress());
+			}
 			transactionRepo.save(transaction);
 		}
 	}
