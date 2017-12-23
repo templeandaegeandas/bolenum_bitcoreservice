@@ -125,7 +125,7 @@ public class PeerGroupProvider {
 		log.debug("addLocalHost()");
 		boolean result=false;
 		try {
-			String hostName=envConfiguration.getDBIp();
+			String hostName=envConfiguration.getBitcoindIp();
 			log.debug("hostName in addLocalHost "+hostName);
 			InetAddress inetAddress = InetAddress.getByName(hostName);
 			int port = envConfiguration.getBitcoindPort();
